@@ -1,0 +1,22 @@
+# dataset
+data/
+
+# training outputs
+results/
+experiments/
+
+# model weights
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+
+# python cache
+__pycache__/
+*.pyc
+
+# editor
+.vscode/
+
+# system
+.DS_Store
