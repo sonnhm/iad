@@ -11,21 +11,27 @@ class Trainer:
         self,
         model,
         dataset,
-        device="cuda",
         batch_size=16,
         lr=1e-3,
         epochs=10,
         checkpoint_dir="checkpoints"
     ):
 
-        self.device = device
-        self.model = model.to(device)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        print("Device:", self.device)
+
+        torch.backends.cudnn.benchmark = True
+
+        self.model = model.to(self.device)
 
         self.dataloader = DataLoader(
             dataset,
             batch_size=batch_size,
-            shuffle=True
-        )
+            shuffle=True,
+            num_workers=0,   # đổi 4 -> 0
+            pin_memory=True
+    )
 
         self.epochs = epochs
 
@@ -37,6 +43,7 @@ class Trainer:
         )
 
         self.checkpoint_dir = checkpoint_dir
+
 
     def train(self):
 

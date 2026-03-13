@@ -14,6 +14,7 @@ model = Autoencoder()
 trainer = Trainer(
     model=model,
     dataset=dataset,
+    batch_size=32,
     epochs=10
 )
 
