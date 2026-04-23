@@ -1956,7 +1956,7 @@ The execution paradigm was decentralized, mapping specific algorithmic capabilit
 | Role | Member Name | Core Academic & Engineering Responsibilities |
 |:---|:---|:---|
 | **Project Lead & AI Architect** | NGUYEN HOANG MINH SON | Principal architect of the LSH-accelerated PatchCore engine. Designed the Agentic hyperparameter optimization loop and the mathematical underpinnings of the Anomaly Index $\tau^*$. Led theoretical validation. |
-| **Data Engineer & ML Researcher** | NGUYEN DANG THAI BINH | Directed the Knowledge Distillation pipeline for the CustomResNet-18 backbone. Architected the CNN+OC-SVM integration logic and formalized the MVTec AD batch processing workflow. |
+| **Data Engineer & ML Researcher** | NGUYEN DANG THAI BINH & ON NGUYEN THIEN PHUC | Directed the Knowledge Distillation pipeline for the CustomResNet-18 backbone. Architected the CNN+OC-SVM integration logic and formalized the MVTec AD batch processing workflow. |
 | **Software Engineer & XAI Integrator** | LE THANH THAO NHI | Consolidated the standalone algorithms into a continuous Flask production codebase. Engineered the Grad-CAM visualization bridging and the Gemini Explainable AI conversational interface. |
 
 <p align="center"><em>Table 10.1: Research team structure and responsibilities.</em></p>
