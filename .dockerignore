@@ -1,0 +1,16 @@
+.env
+.venv
+.git
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+datasets/
+# checkpoints/
+runs/
+docs/
+*.md
+*.png
+*.webp

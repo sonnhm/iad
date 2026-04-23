@@ -1,0 +1,19 @@
+# PatchCore config
+data:
+  root: "datasets/mvtec"
+  category: "bottle"
+  image_size: 256
+
+# Knowledge Distillation training cho backbone
+training:
+  backbone_epochs: 30
+  backbone_lr: 0.001
+  batch_size: 32
+
+# PatchCore inference
+patchcore:
+  coreset_ratio: 0.1   # tỷ lệ giữ lại khi coreset subsampling
+  k_neighbors: 1       # k-NN neighbors
+
+checkpoint:
+  backbone_dir: "checkpoints/backbone"

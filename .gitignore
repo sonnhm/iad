@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# AI Models & Data
+datasets/
+checkpoints/backbone/
+checkpoints/patchcore/
+checkpoints/autoencoder/
+checkpoints/ocsvm/
+checkpoints/thresholds.json
+*.pth
+*.pt
+!checkpoints/yolo/mvtec/weights/best.pt
+*.joblib
+runs/
+experiments/logs/
+experiments/research_log.txt
+
+# Generated outputs
+results/
+*.png
+*.jpg
+*.jpeg
+
+# Env variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.bak

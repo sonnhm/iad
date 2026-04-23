@@ -1,0 +1,9 @@
+# CNN + OC-SVM config
+data:
+  root: "datasets/mvtec"
+  category: "bottle"
+  image_size: 256
+
+ocsvm:
+  gamma: "auto"
+  batch_size: 32

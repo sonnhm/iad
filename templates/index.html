@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAD — Industrial Anomaly Detection</title>
+    <meta name="description" content="Demo hệ thống phát hiện bất thường công nghiệp bằng AI: PatchCore, Autoencoder, CNN+OC-SVM">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon"></span>
+                <h1>IAD <span class="accent">Demo</span></h1>
+            </div>
+            <p class="subtitle">Industrial Anomaly Detection — Phát hiện bất thường sản phẩm bằng AI</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Control Panel -->
+        <section class="control-panel glass-card">
+            <h2> Cấu hình</h2>
+
+            <div class="controls-grid">
+                <!-- Category -->
+                <div class="control-group">
+                    <label for="category"> Loại sản phẩm</label>
+                    <select id="category">
+                        <option value="auto"> Tự động nhận diện (YOLOv8)</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}">{{ cat | capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Model -->
+                <div class="control-group">
+                    <label for="model"> Model</label>
+                    <select id="model">
+                        <option value="patchcore">PatchCore (Custom ResNet18)</option>
+                        <option value="autoencoder">Autoencoder</option>
+                        <option value="cnn_ocsvm">CNN + OC-SVM</option>
+                        <option value="all"> So sánh cả 3</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-content">
+                    <div class="upload-icon"></div>
+                    <p class="upload-text">Kéo thả ảnh vào đây</p>
+                    <p class="upload-subtext">hoặc click để chọn file — hỗ trợ nhiều ảnh cùng lúc</p>
+                    <p class="upload-formats">PNG, JPG, BMP — max 12 ảnh — 10MB/ảnh</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" multiple hidden>
+            </div>
+
+            <!-- Preview Gallery -->
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <div class="preview-header">
+                    <h3> Ảnh đã chọn <span id="selectedCount" class="selected-count-badge"></span></h3>
+                    <button class="btn-clear" id="clearBtn">✕ Xóa tất cả</button>
+                </div>
+                <div class="preview-gallery" id="previewGallery"></div>
+            </div>
+
+            <!-- Predict Button -->
+            <button class="btn-predict" id="predictBtn" disabled>
+                <span class="btn-text"> Phân tích</span>
+                <span class="btn-loading" style="display: none;">
+                    <span class="spinner"></span> Đang xử lý...
+                </span>
+            </button>
+        </section>
+
+        <!-- Results Panel -->
+        <section class="results-panel" id="resultsPanel" style="display: none;">
+            <h2> Kết quả phân tích</h2>
+            <div id="resultsContainer"></div>
+        </section>
+    </main>
+
+        <!-- Chatbot XAI Widget -->
+        <div class="chat-widget" id="chatWidget">
+            <button class="chat-toggle-btn" id="chatToggleBtn" title="Hỏi Chuyên gia">
+                <span style="font-size: 1.5rem;"></span>
+            </button>
+            <div class="chat-window" id="chatWindow" style="display: none;">
+                <div class="chat-header">
+                    <div>
+                        <h3 style="margin-bottom: 5px;"> Chuyên gia XAI</h3>
+                        <select id="chatMode" style="background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 2px 5px; font-size: 0.8rem; outline: none; cursor:pointer;">
+                            <option value="generative">Chuyên gia đàm thoại (AI Generative)</option>
+                            <option value="rule_based">Phân tích cứng (Offline / Local) </option>
+                        </select>
+                    </div>
+                    <button class="chat-close-btn" id="chatCloseBtn">✕</button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message bot">
+                        Xin chào! Tôi là Cố vấn AI phân tích khuyết tật (Explainable AI). Hãy upload ảnh, chạy phân tích và hỏi tôi nếu bạn cần mổ xẻ về kết quả của thuật toán!
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="VD: Tại sao sản phẩm này lại báo lỗi?">
+                    <button id="chatSendBtn">➤</button>
+                </div>
+            </div>
+        </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>IAD Project — PatchCore | Autoencoder | CNN+OC-SVM</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

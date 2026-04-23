@@ -1,0 +1,13 @@
+# Autoencoder config
+data:
+  root: "datasets/mvtec"
+  category: "bottle"
+  image_size: 256
+
+training:
+  batch_size: 32
+  epochs: 50
+  lr: 0.001
+
+checkpoint:
+  dir: "checkpoints/autoencoder"
