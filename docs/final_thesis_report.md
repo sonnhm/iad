@@ -35,7 +35,7 @@ We would like to express our sincere gratitude to our academic advisor Mr. DAO D
 <div style="page-break-after: always;"></div>
 
 ## Abstract
-Artificial Intelligence optical inspection is rapidly becoming a mandatory standard in industrial manufacturing, completely replacing the inconsistent and error-prone manual measurement methods. This thesis proposes and develops a comparative multi-model, Unsupervised Anomaly Detection (UAD) system executed concurrently that operates entirely on Nominal Manifolds. The system deploys a comparative triad of models: fundamental machine learning (OC-SVM), structural approximations via generative autoencoders, and its apex architecture, the memory-based Enhanced PatchCore. By thoroughly exploiting a `CustomResNet18` backbone fortified with Knowledge Distillation, along with a deterministic `k-Center Greedy Coreset` subsampling strategy combined with Locality-Sensitive Hashing (LSH), the system unlocks unprecedented real-time processing capabilities. This research rigorously evaluates latency, VRAM optimization, and quantitative efficacy through an exhaustive Ablation Study on the MVTec AD dataset (15 categories). Furthermore, we establish mathematical boundaries for error rates and numerical stability. The finalized results firmly establish the industrial superiority and on-premise viability of our optimized framework for next-generation smart manufacturing lines.
+Artificial Intelligence optical inspection is rapidly becoming a mandatory standard in industrial manufacturing, completely replacing the inconsistent and error-prone manual measurement methods. However, the extreme rarity and unpredictability of industrial defects render supervised approaches infeasible, while existing unsupervised alternatives each exhibit fundamental limitations: reconstruction-based methods (Autoencoders [12]) suffer from information loss that obscures micro-defects, distribution-based methods (OC-SVM [4]) lack spatial localization capability, and embedding-based methods such as PatchCore [2], despite achieving near-perfect accuracy, incur prohibitive computational costs that prevent real-time deployment on resource-constrained hardware. This thesis proposes and develops a comparative multi-model, Unsupervised Anomaly Detection (UAD) system executed concurrently that operates entirely on Nominal Manifolds. The system deploys a comparative triad of models: fundamental machine learning (OC-SVM [4]), structural approximations via generative autoencoders [12], and its apex architecture, the memory-based Enhanced PatchCore [2]. By thoroughly exploiting a `CustomResNet18` [1] backbone fortified with Knowledge Distillation [11], along with a deterministic `k-Center Greedy Coreset` subsampling strategy combined with Locality-Sensitive Hashing (LSH) [8, 23], the system unlocks unprecedented real-time processing capabilities. This research rigorously evaluates latency, VRAM optimization, and quantitative efficacy through an exhaustive Ablation Study on the MVTec AD dataset [3] (15 categories). Furthermore, we establish mathematical boundaries for error rates and numerical stability. The finalized results firmly establish the industrial superiority and on-premise viability of our optimized framework for next-generation smart manufacturing lines.
 
 <div style="page-break-after: always;"></div>
 
@@ -160,9 +160,9 @@ These three factors collectively eliminate supervised classification and segment
 
 The specific research problem addressed in this thesis can be stated precisely:
 
-> **How can we maintain PatchCore's near-perfect anomaly detection accuracy while reducing its inference-time computational cost to levels suitable for real-time deployment on resource-constrained industrial hardware (≤ 6GB VRAM)?**
+> **How can we maintain PatchCore's [2] near-perfect anomaly detection accuracy while reducing its inference-time computational cost to levels suitable for real-time deployment on resource-constrained industrial hardware (≤ 6GB VRAM)?**
 
-This problem is non-trivial because the three primary cost drivers in PatchCore's inference pipeline are tightly coupled:
+This problem is non-trivial because the three primary cost drivers in PatchCore's [2] inference pipeline are tightly coupled:
 
 1. **Memory bank size**: The number of stored patch embeddings directly determines both search time and memory consumption. Aggressive coreset reduction improves speed but risks dropping embeddings that represent rare-but-critical surface patterns, reducing recall on micro-defects.
 
@@ -171,48 +171,48 @@ This problem is non-trivial because the three primary cost drivers in PatchCore'
 3. **Hardware memory ceiling**: Loading the full model (backbone + memory bank) alongside input tensors on a 6GB GPU leaves minimal headroom for batch processing, forcing single-image sequential inference and preventing throughput optimization.
 
 *   **RQ1:** Where lies the actual empirical boundary between Classical ML (SVM) and Deep Feature-based methods in industrial anomaly detection?
-*   **RQ2:** Why does PatchCore outperform Autoencoders in reconstruction fidelity and defect localization?
+*   **RQ2:** Why does PatchCore [2] outperform Autoencoders [12] in reconstruction fidelity and defect localization?
 *   **RQ3:** What is the direct trade-off between LSH/Coreset approximation and AUROC performance?
 
 These constraints define a three-dimensional optimization space (accuracy × speed × memory) where improvements along one axis typically degrade another. The key insight of this work is that by introducing **approximate search structures** (Locality-Sensitive Hashing with XOR-Probe) and **hardware-aware distance computation** (matrix decomposition for GPU Tensor Cores), we can shift the Pareto frontier — achieving near-exact accuracy at dramatically reduced computational cost.
 
 ## 1.4 Proposed System & Contributions
 
-This thesis presents an **end-to-end industrial anomaly detection system** that extends the PatchCore framework with three categories of contribution:
+This thesis presents an **end-to-end industrial anomaly detection system** that extends the PatchCore [2] framework with three categories of contribution:
 
 ### Contribution 1: Accelerated Approximate Search via LSH + XOR-Probe
 
-We replace PatchCore's exhaustive nearest-neighbor search with a Locality-Sensitive Hashing (LSH) index [8, 23] that maps 384-dimensional feature vectors to 12-bit binary hash codes, partitioning the memory bank into 4,096 buckets. To mitigate the boundary-error problem inherent in LSH (where nearby vectors are separated by a hash boundary), we introduce an **XOR-Probe** mechanism that searches not only the exact hash bucket but also all Hamming-adjacent buckets (distance = 1). This achieves high recall (94.8%) with minimal accuracy degradation (see Chapter 8) while reducing search complexity from $O(N)$ to approximately $O(N/4096 \times 13)$ — a reduction factor of approximately 300×.
+We replace PatchCore's [2] exhaustive nearest-neighbor search with a Locality-Sensitive Hashing (LSH) index [8, 23] that maps 384-dimensional feature vectors to 12-bit binary hash codes, partitioning the memory bank into 4,096 buckets. To mitigate the boundary-error problem inherent in LSH (where nearby vectors are separated by a hash boundary), we introduce an **XOR-Probe** mechanism that searches not only the exact hash bucket but also all Hamming-adjacent buckets (distance = 1). This achieves high recall (94.8%) with minimal accuracy degradation (see Chapter 8) while reducing search complexity from $O(N)$ to approximately $O(N/4096 \times 13)$ — a reduction factor of approximately 300×.
 
 ### Contribution 2: Statistical Threshold Calibration and Normalized Anomaly Index
 
-Rather than relying on manually tuned or heuristically chosen thresholds, we derive optimal decision boundaries using **Youden's J statistic** applied to the ROC curve computed on a held-out validation set. This produces mathematically optimal thresholds that maximize the separation between true positive rate and false positive rate. We further introduce a **Normalized Anomaly Index** ($I = s / \tau$, where $s$ is the raw anomaly score and $\tau$ is the Youden-optimal threshold) that provides a model-agnostic, human-interpretable risk scale where $I < 1.0$ indicates normalcy and $I > 1.0$ indicates anomaly.
+Rather than relying on manually tuned or heuristically chosen thresholds, we derive optimal decision boundaries using **Youden's J statistic** [13] applied to the ROC curve computed on a held-out validation set. This produces mathematically optimal thresholds that maximize the separation between true positive rate and false positive rate. We further introduce a **Normalized Anomaly Index** ($I = s / \tau$, where $s$ is the raw anomaly score and $\tau$ is the Youden-optimal threshold) that provides a model-agnostic, human-interpretable risk scale where $I < 1.0$ indicates normalcy and $I > 1.0$ indicates anomaly.
 
 ### Contribution 3: Agentic Hyperparameter Optimization
 
-We integrate a Large Language Model (Gemini) as an **autonomous research agent** that analyzes experimental results (AUROC, inference time, memory usage per category) and proposes hyperparameter adjustments (coreset ratio, k-neighbors, LSH bit-width) for subsequent training iterations. This closes the optimization loop without human intervention, enabling category-specific tuning across all 15 MVTec AD product types.
+We integrate a Large Language Model (Gemini) as an **autonomous research agent** that analyzes experimental results (AUROC, inference time, memory usage per category) and proposes hyperparameter adjustments (coreset ratio, k-neighbors, LSH bit-width) for subsequent training iterations. This closes the optimization loop without human intervention, enabling category-specific tuning across all 15 MVTec AD [3] product types.
 
 ### System Integration
 
-These contributions are not independent modules bolted onto PatchCore; they form a **vertically integrated pipeline** where each layer's design is informed by the constraints of adjacent layers. The LSH index structure is designed around the 384-dimensional feature vectors produced by the backbone's hierarchical fusion. The threshold calibration operates on the distance distribution shaped by the coreset selection. The agentic optimizer adjusts parameters that propagate through all layers simultaneously. This system-level co-design is a central theme of the thesis.
+These contributions are not independent modules bolted onto PatchCore [2]; they form a **vertically integrated pipeline** where each layer's design is informed by the constraints of adjacent layers. The LSH index structure is designed around the 384-dimensional feature vectors produced by the backbone's hierarchical fusion. The threshold calibration operates on the distance distribution shaped by the coreset selection. The agentic optimizer adjusts parameters that propagate through all layers simultaneously. This system-level co-design is a central theme of the thesis.
 
 ## 1.5 Thesis Organization
 
 The remainder of this thesis is organized as follows:
 
-- **Chapter 2 (Related Work)** provides a critical analysis of reconstruction-based, distribution-based, and embedding-based anomaly detection methods, establishing the theoretical foundations for each paradigm and identifying their specific failure modes that motivate PatchCore's design.
+- **Chapter 2 (Related Work)** provides a critical analysis of reconstruction-based, distribution-based, and embedding-based anomaly detection methods, establishing the theoretical foundations for each paradigm and identifying their specific failure modes that motivate PatchCore's [2] design.
 
-- **Chapter 3 (Feature Backbone)** dissects the ResNet-18 feature extraction architecture at the tensor level, explaining the rationale behind layer selection, normalization constants, and the hierarchical representation learning that produces the 384-dimensional patch embeddings. This chapter also details the **Knowledge Distillation** framework that transfers a frozen Teacher (ResNet18) representation into a learnable Student (`CustomResNet18`) backbone.
+- **Chapter 3 (Feature Backbone)** dissects the ResNet-18 [1] feature extraction architecture at the tensor level, explaining the rationale behind layer selection, normalization constants, and the hierarchical representation learning that produces the 384-dimensional patch embeddings. This chapter also details the **Knowledge Distillation** [11] framework that transfers a frozen Teacher (ResNet18 [1]) representation into a learnable Student (`CustomResNet18` [1]) backbone.
 
-- **Chapter 4 (PatchCore Engine)** formalizes the memory bank construction, including the mathematical formulation of the Minimax Facility Location problem underlying coreset selection and the greedy approximation algorithm with its theoretical guarantees.
+- **Chapter 4 (PatchCore [2] Engine)** formalizes the memory bank construction, including the mathematical formulation of the Minimax Facility Location problem underlying coreset selection and the greedy approximation algorithm with its theoretical guarantees.
 
 - **Chapter 5 (Optimization Internals)** presents the LSH indexing scheme, XOR-Probe search, and GPU-optimized distance computation, analyzing the accuracy-speed trade-off introduced by approximate search.
 
-- **Chapter 6 (System Pipeline & Calibration)** details the full system pipeline including CLAHE illumination stabilization, YOLOv8 product routing, the statistical threshold derivation via Youden's J, the Anomaly Index normalization, and the sequential batch processing strategy designed for memory-constrained hardware.
+- **Chapter 6 (System Pipeline & Calibration)** details the full system pipeline including CLAHE [19] illumination stabilization, YOLOv8 [18] product routing, the statistical threshold derivation via Youden's J [13], the Anomaly Index normalization, and the sequential batch processing strategy designed for memory-constrained hardware.
 
 - **Chapter 7 (Agentic ML & XAI)** describes the LLM-driven hyperparameter optimization loop and the explainable AI layer that converts numerical anomaly scores into natural-language diagnostic reports.
 
-- **Chapter 8 (Experiments & Evaluation)** presents experimental results on the MVTec AD benchmark, comparing the proposed system against the Autoencoder and CNN-OCSVM baselines, and provides ablation studies for each optimization component.
+- **Chapter 8 (Experiments & Evaluation)** presents experimental results on the MVTec AD [3] benchmark, comparing the proposed system against the Autoencoder [12] and CNN-OCSVM [4] baselines, and provides ablation studies for each optimization component.
 
 - **Chapter 9 (Conclusion & Future Work)** summarizes contributions, analyzes limitations and failure cases, and outlines four concrete research directions.
 
@@ -232,7 +232,7 @@ This chapter provides a structured review of the three dominant paradigms in uns
 
 Reconstruction-based anomaly detection rests on a precise mathematical assumption: nominal (defect-free) images occupy a low-dimensional manifold $\mathcal{M}$ embedded in the high-dimensional pixel space $\mathbb{R}^{C \times H \times W}$. A model trained to project inputs onto $\mathcal{M}$ and reconstruct them will produce high fidelity outputs for nominal inputs (which lie on $\mathcal{M}$) and degraded outputs for anomalous inputs (which lie off $\mathcal{M}$). The reconstruction error at each pixel then serves as a spatially-resolved anomaly score.
 
-The canonical implementation is the **Convolutional Autoencoder (CAE)**, which parameterizes this projection via an encoder-decoder architecture:
+The canonical implementation is the **Convolutional Autoencoder (CAE)** [12], which parameterizes this projection via an encoder-decoder architecture:
 
 $$\text{Encoder: } z = f_\theta(x), \quad z \in \mathbb{R}^{d_z}$$
 $$\text{Decoder: } \hat{x} = g_\phi(z), \quad \hat{x} \in \mathbb{R}^{C \times H \times W}$$
@@ -265,7 +265,7 @@ Reconstruction-based methods exhibit three systematic failure modes in industria
 
 ### 2.1.4 Variants and Extensions
 
-Variational Autoencoders (VAEs) address some of these limitations by imposing a distributional prior on the latent space, enabling probabilistic anomaly scoring via the evidence lower bound (ELBO). However, they introduce additional hyperparameters (KL divergence weight, prior distribution choice) and typically produce even blurrier reconstructions due to the regularization pressure. Memory-augmented autoencoders (MemAE) restrict the decoder to reconstruct using only a learned dictionary of normal prototypes, partially mitigating anomaly leakage at the cost of increased architectural complexity.
+Variational Autoencoders (VAEs) [12] address some of these limitations by imposing a distributional prior on the latent space, enabling probabilistic anomaly scoring via the evidence lower bound (ELBO). However, they introduce additional hyperparameters (KL divergence weight, prior distribution choice) and typically produce even blurrier reconstructions due to the regularization pressure. Memory-augmented autoencoders (MemAE) restrict the decoder to reconstruct using only a learned dictionary of normal prototypes, partially mitigating anomaly leakage at the cost of increased architectural complexity.
 
 Despite these extensions, the fundamental limitation persists: reconstruction-based methods must pass all information through a single computational bottleneck, creating an irrecoverable information loss for fine-grained spatial details.
 
@@ -277,7 +277,7 @@ Despite these extensions, the fundamental limitation persists: reconstruction-ba
 
 Distribution-based methods adopt a different mathematical formulation: rather than learning to reconstruct nominal images, they learn a **decision boundary** that encloses the nominal data distribution in a suitable feature space. Anomalies are defined as points falling outside this boundary.
 
-The foundational method is **One-Class SVM (OC-SVM)** (Schölkopf et al., 2001), which solves the following optimization problem:
+The foundational method is **One-Class SVM (OC-SVM)** (Schölkopf et al., 2001) [4], which solves the following optimization problem:
 
 $$\min_{w, \rho, \xi} \frac{1}{2} \|w\|^2 + \frac{1}{\nu n} \sum_{i=1}^{n} \xi_i - \rho$$
 $$\text{subject to: } w \cdot \Phi(x_i) \geq \rho - \xi_i, \quad \xi_i \geq 0$$
@@ -288,7 +288,7 @@ where $\Phi(\cdot)$ is a kernel-induced feature mapping and $\nu$ controls the f
 
 Applying OC-SVM directly to raw pixel values is computationally intractable and statistically ineffective. A $256 \times 256$ RGB image corresponds to a point in $\mathbb{R}^{196608}$ — a space where the curse of dimensionality renders distance-based methods unreliable. Euclidean distance in high-dimensional pixel space is dominated by irrelevant variations (illumination, minor alignment shifts) rather than semantically meaningful differences.
 
-The standard solution, adopted in our CNN-OCSVM baseline, is to use a pre-trained convolutional network (ResNet-18) as a feature extractor. The output of the global average pooling layer produces a 512-dimensional feature vector that encodes high-level semantic information while discarding pixel-level noise. `Joblib Caching` is implemented to detach training dataset dependencies at runtime. However, this architectural choice introduces a fundamental limitation: the feature vector is a **global summary** of the entire image. All spatial information is collapsed by the average pooling operation. The OC-SVM can determine *whether* an image is anomalous but cannot indicate *where* the anomaly is located.
+The standard solution, adopted in our CNN-OCSVM [4] baseline, is to use a pre-trained convolutional network (ResNet-18 [1]) as a feature extractor. The output of the global average pooling layer produces a 512-dimensional feature vector that encodes high-level semantic information while discarding pixel-level noise. `Joblib Caching` is implemented to detach training dataset dependencies at runtime. However, this architectural choice introduces a fundamental limitation: the feature vector is a **global summary** of the entire image. All spatial information is collapsed by the average pooling operation. The OC-SVM [4] can determine *whether* an image is anomalous but cannot indicate *where* the anomaly is located.
 
 ### 2.2.3 Failure Mode Analysis
 
@@ -300,7 +300,7 @@ The standard solution, adopted in our CNN-OCSVM baseline, is to use a pre-traine
 
 ### 2.2.4 Variants: Deep SVDD
 
-Deep SVDD (Ruff et al., 2018) replaces the fixed kernel with a learned deep network that maps inputs to a hypersphere-enclosing representation. The training objective minimizes the mean distance of all training embeddings to a learned center $c$:
+Deep SVDD (Ruff et al., 2018) [7] replaces the fixed kernel with a learned deep network that maps inputs to a hypersphere-enclosing representation. The training objective minimizes the mean distance of all training embeddings to a learned center $c$:
 
 $$\mathcal{L}_{\text{SVDD}} = \frac{1}{n} \sum_{i=1}^{n} \| f_\theta(x_i) - c \|^2$$
 
@@ -318,11 +318,11 @@ The critical innovation is operating at the **patch level** rather than the imag
 
 ### 2.3.2 Evolution: From SPADE to PatchCore
 
-**SPADE** (Cohen & Hoshen, 2020) introduced the concept of storing all patch-level features from the training set and performing k-NN lookup at inference time. For each spatial position in the test image's feature map, the nearest neighbor in the memory bank is found, and the distance serves as a pixel-level anomaly score. While effective, SPADE stores the complete feature set without compression, resulting in memory banks of several gigabytes for moderately-sized training sets.
+**SPADE** (Cohen & Hoshen, 2020) [5] introduced the concept of storing all patch-level features from the training set and performing k-NN lookup at inference time. For each spatial position in the test image's feature map, the nearest neighbor in the memory bank is found, and the distance serves as a pixel-level anomaly score. While effective, SPADE stores the complete feature set without compression, resulting in memory banks of several gigabytes for moderately-sized training sets.
 
-**PaDiM** (Defard et al., 2021) replaced the explicit memory bank with a parametric model: for each spatial position, the training features are summarized by a multivariate Gaussian distribution (mean + covariance). Anomaly scores are computed via the Mahalanobis distance. This dramatically reduces memory requirements but assumes Gaussian-distributed features at each position — an assumption that may not hold for complex industrial textures.
+**PaDiM** (Defard et al., 2021) [6] replaced the explicit memory bank with a parametric model: for each spatial position, the training features are summarized by a multivariate Gaussian distribution (mean + covariance). Anomaly scores are computed via the Mahalanobis distance. This dramatically reduces memory requirements but assumes Gaussian-distributed features at each position — an assumption that may not hold for complex industrial textures.
 
-**PatchCore** (Roth et al., 2022) synthesized the strengths of both approaches while addressing their specific weaknesses:
+**PatchCore** (Roth et al., 2022) [2] synthesized the strengths of both approaches while addressing their specific weaknesses:
 
 1. **Hierarchical feature fusion**: Rather than using features from a single backbone layer, PatchCore concatenates intermediate feature maps from multiple layers (Layer 2 at 128-d and Layer 3 at 256-d, after spatial alignment via bilinear interpolation), producing 384-dimensional patch embeddings that encode both fine-grained texture (from shallower layers) and semantic context (from deeper layers).
 
@@ -332,7 +332,7 @@ The critical innovation is operating at the **patch level** rather than the imag
 
 ### 2.3.3 The Remaining Gap: Computational Efficiency
 
-PatchCore's anomaly detection performance is near-optimal: image-level AUROC exceeds 99% on the MVTec AD benchmark for most product categories. The open problem is **inference efficiency**.
+PatchCore's [2] anomaly detection performance is near-optimal: image-level AUROC exceeds 99% on the MVTec AD benchmark [3] for most product categories. The open problem is **inference efficiency**.
 
 The anomaly scoring step requires computing the distance from every test patch embedding to its nearest neighbor in the coreset. Even after coreset reduction (typically to 10% of the original bank), the memory bank may contain 5,000–15,000 embeddings. For each test image, 1,024 query patches (from a 32×32 feature map) must each find their nearest neighbor among these embeddings. This exhaustive search has complexity:
 
@@ -346,7 +346,7 @@ Several approximation strategies have been proposed in the broader nearest-neigh
 - **FAISS (Facebook AI Similarity Search)**: Provides GPU-accelerated approximate search via product quantization, but introduces a heavy external dependency and quantization-induced accuracy degradation.
 - **Annoy (Approximate Nearest Neighbors Oh Yeah)**: Uses random projection trees, offering a good speed-accuracy trade-off but lacking GPU acceleration.
 
-None of these off-the-shelf solutions are specifically designed for the PatchCore use case, where the memory bank is relatively small (thousands, not millions, of vectors), the query volume per image is moderate (hundreds of patches), and the accuracy requirements are extreme (missing a single defective patch means missing the defect). This gap — the need for an **application-specific approximate search** that is fast, GPU-native, and maintains high recall with minimal degradation — is the precise technical problem addressed by our LSH + XOR-Probe contribution (Chapter 5).
+None of these off-the-shelf solutions are specifically designed for the PatchCore [2] use case, where the memory bank is relatively small (thousands, not millions, of vectors), the query volume per image is moderate (hundreds of patches), and the accuracy requirements are extreme (missing a single defective patch means missing the defect). This gap — the need for an **application-specific approximate search** that is fast, GPU-native, and maintains high recall with minimal degradation — is the precise technical problem addressed by our LSH + XOR-Probe contribution (Chapter 5).
 
 ---
 
@@ -365,7 +365,7 @@ The following table summarizes the paradigm comparison and positions our contrib
 <p align="center"><em>Table 2.1: Paradigm comparison and positioning of contributions across reconstruction, distribution, and embedding-based methods.</em></p>
 
 
-Our system does not propose a new anomaly detection paradigm. Instead, it addresses the **deployment gap** between PatchCore's theoretical performance and its practical viability on constrained hardware, while adding principled statistical calibration and autonomous optimization capabilities that are absent from the original formulation.
+Our system does not propose a new anomaly detection paradigm. Instead, it addresses the **deployment gap** between PatchCore's [2] theoretical performance and its practical viability on constrained hardware, while adding principled statistical calibration and autonomous optimization capabilities that are absent from the original formulation.
 
 ---
 
@@ -388,7 +388,7 @@ This project adheres strictly to research ethics:
   <p><em>Figure 3.1: Tensor-level feature extraction and Knowledge Distillation pipeline for the CustomResNet-18 backbone.</em></p>
 </div>
 
-The quality of any embedding-based anomaly detection system is bounded by the quality of its feature representations. PatchCore does not learn task-specific features; instead, it relies entirely on a pre-trained convolutional backbone to transform raw pixel inputs into semantically meaningful patch embeddings. This architectural choice — using frozen, pre-trained features rather than task-specific learned representations — is both PatchCore's greatest strength (zero training cost, immediate transferability) and a potential liability (the features are optimized for ImageNet classification, not industrial defect sensitivity).
+The quality of any embedding-based anomaly detection system is bounded by the quality of its feature representations. As illustrated in Figure 3.1, PatchCore does not learn task-specific features; instead, it relies entirely on a pre-trained convolutional backbone to transform raw pixel inputs into semantically meaningful patch embeddings. This architectural choice — using frozen, pre-trained features rather than task-specific learned representations — is both PatchCore's greatest strength (zero training cost, immediate transferability) and a potential liability (the features are optimized for ImageNet classification, not industrial defect sensitivity).
 
 This chapter provides a tensor-level dissection of the ResNet-18 backbone, tracing the exact transformation of data at each architectural stage and justifying the specific layer selection that determines the quality of the downstream memory bank.
 
@@ -588,7 +588,7 @@ On a modern GPU, ~1,060M MACs translate to approximately **1.5ms inference time*
   <p><em>Figure 4.1: The PatchCore memory engine: from multi-scale feature extraction to coreset construction and anomaly scoring.</em></p>
 </div>
 
-Having established the backbone's feature extraction mechanics (Chapter 3), we now formalize the core algorithmic contribution of PatchCore: the construction of a compressed nominal memory bank and the distance-based anomaly scoring mechanism that operates over it. This chapter treats the memory bank not as a data structure but as a **mathematical object** — a discrete approximation to the continuous manifold of nominal patch embeddings — and analyzes the theoretical guarantees and practical limitations of the compression algorithm.
+Having established the backbone's feature extraction mechanics (Chapter 3), we now formalize the core algorithmic contribution of PatchCore. Figure 4.1 provides an architectural overview of the complete PatchCore memory engine, from multi-scale feature extraction through coreset construction to anomaly scoring. This chapter treats the memory bank not as a data structure but as a **mathematical object** — a discrete approximation to the continuous manifold of nominal patch embeddings — and analyzes the theoretical guarantees and practical limitations of the compression algorithm.
 
 ---
 
@@ -1045,7 +1045,7 @@ The LSH hash quality degrades as the intrinsic dimensionality of the data deviat
   <p><em>Figure 6.1: End-to-end industrial inference pipeline featuring CLAHE preprocessing, YOLOv8 routing, parallel execution, and Anomaly Index calibration.</em></p>
 </div>
 
-The preceding chapters established the mechanics of feature extraction (Chapter 3), memory bank construction (Chapter 4), and accelerated search (Chapter 5). Together, these produce a raw anomaly score $s \in \mathbb{R}^+$ for each input image. However, a raw score alone is operationally useless in a manufacturing environment. The production line requires a binary decision (*accept* or *reject*) and, ideally, a calibrated risk level that enables differentiated responses (alert, pause, halt). This chapter formalizes the transformation from raw scores to actionable decisions and describes the engineering constraints that govern the deployment pipeline.
+Figure 6.1 presents the end-to-end system pipeline described in this chapter. The preceding chapters established the mechanics of feature extraction (Chapter 3), memory bank construction (Chapter 4), and accelerated search (Chapter 5). Together, these produce a raw anomaly score $s \in \mathbb{R}^+$ for each input image. However, a raw score alone is operationally useless in a manufacturing environment. The production line requires a binary decision (*accept* or *reject*) and, ideally, a calibrated risk level that enables differentiated responses (alert, pause, halt). This chapter formalizes the transformation from raw scores to actionable decisions and describes the engineering constraints that govern the deployment pipeline.
 
 ---
 
@@ -1566,7 +1566,7 @@ The MVTec Anomaly Detection dataset (Bergmann et al., 2019) is the standard benc
   <p><em>Figure 8.1: Examples from the MVTec AD dataset comparing nominal samples with defective variants across Texture and Object categories.</em></p>
 </div>
 
-Each category contains between 60 and 391 training images, all guaranteed to be defect-free. The test set includes both normal and anomalous samples, with pixel-level ground-truth masks for anomalous images. The defect types span a wide range of visual characteristics: structural (broken, bent), surface (scratch, contamination), and color (stain, discoloration).
+As shown in Figure 8.1, each category contains between 60 and 391 training images, all guaranteed to be defect-free. The test set includes both normal and anomalous samples, with pixel-level ground-truth masks for anomalous images. The defect types span a wide range of visual characteristics: structural (broken, bent), surface (scratch, contamination), and color (stain, discoloration).
 
 ### 8.1.2 Hardware Configuration
 
@@ -1670,7 +1670,7 @@ A critical aspect of this thesis is the engineering journey from a naive impleme
 
 ### 8.3.2 Analysis of Results
 
-**A nuanced competitive landscape.** Unlike the idealized scenario where a single model dominates all categories, the real experimental results reveal a **complementary triad** in which each model class exhibits distinct strengths. CNN-OCSVM achieves the highest mean image AUROC (0.787), PatchCore occupies the middle (0.736), and the Autoencoder trails (0.668). However, this ranking tells an incomplete story — PatchCore's unique value proposition lies in **pixel-level localization** (mean Pixel AUROC = 0.854), a capability that neither baseline possesses.
+**A nuanced competitive landscape.** The ROC curves in Figure 8.2 reveal that, unlike the idealized scenario where a single model dominates all categories, the real experimental results form a **complementary triad** in which each model class exhibits distinct strengths. CNN-OCSVM achieves the highest mean image AUROC (0.787), PatchCore occupies the middle (0.736), and the Autoencoder trails (0.668). However, this ranking tells an incomplete story — PatchCore's unique value proposition lies in **pixel-level localization** (mean Pixel AUROC = 0.854), a capability that neither baseline possesses.
 
 **CNN-OCSVM's surprising strength.** The CNN-OCSVM baseline achieves the highest image-level AUROC on 8 out of 15 categories, including Bottle (0.987), Carpet (0.760), and Tile (0.935). This counter-intuitive result has a clear explanation: the SVM operates on the global 512-D feature vector from ResNet-18's `avgpool` layer, which captures the holistic appearance of the product. For categories where anomalies cause large-scale visual disruption (e.g., a broken bottle, a contaminated tile), this global representation is highly effective. The SVM's decision boundary is also well-calibrated because it explicitly models the support of the nominal distribution.
 
@@ -1679,7 +1679,7 @@ A critical aspect of this thesis is the engineering journey from a naive impleme
 - **ResNet-18 backbone** (vs. WideResNet-50): The smaller backbone produces less discriminative 384-D features compared to WideResNet-50's 1,792-D features.
 - **LSH approximate search**: The 5.2% recall gap at 12-bit XOR-Probe (Chapter 5.3.3) contributes to missed nearest neighbors.
 
-**PatchCore's localization advantage.** Despite the lower image-level AUROC, PatchCore achieves an outstanding mean Pixel AUROC of 0.854 — with categories like Leather (0.982), Hazelnut (0.969), and Toothbrush (0.930) approaching near-perfect localization. This capability is architecturally impossible for CNN-OCSVM (which produces only a single global score) and the Autoencoder (whose reconstruction error is spatially noisy).
+**PatchCore's localization advantage.** As visualized in Figure 8.3, despite the lower image-level AUROC, PatchCore achieves an outstanding mean Pixel AUROC of 0.854 — with categories like Leather (0.982), Hazelnut (0.969), and Toothbrush (0.930) approaching near-perfect localization. This capability is architecturally impossible for CNN-OCSVM (which produces only a single global score) and the Autoencoder (whose reconstruction error is spatially noisy).
 
 <div align="center">
   <img src="assets/results/heatmap_comparison.png" alt="Anomaly Localization Heatmap Comparison" style="max-width: 90%; width: auto;"/>
@@ -1720,7 +1720,7 @@ Comparative analysis against published state-of-the-art architectures:
 
 3. **The deployment reality.** Vanilla PatchCore at 100% coreset with WideResNet-50 requires >12GB VRAM and produces >10s inference per image — it is **non-functional** on our target hardware. The relevant comparison is not "our system vs. vanilla PatchCore" but "our system vs. no system at all" on 6GB hardware.
 
-**The Pareto interpretation.** Our system occupies a previously empty region of the accuracy-latency-memory Pareto frontier. No published method achieves functional inference on 6GB VRAM with sub-second latency while providing pixel-level anomaly localization (mean Pixel AUROC = 0.854). The CNN-OCSVM baseline achieves higher image AUROC (0.787) but provides zero spatial localization — it can flag a defective image but cannot tell the operator *where* or *what type* of defect exists.
+**The Pareto interpretation.** As depicted in Figure 8.4, our system occupies a previously empty region of the accuracy-latency-memory Pareto frontier. No published method achieves functional inference on 6GB VRAM with sub-second latency while providing pixel-level anomaly localization (mean Pixel AUROC = 0.854). The CNN-OCSVM baseline achieves higher image AUROC (0.787) but provides zero spatial localization — it can flag a defective image but cannot tell the operator *where* or *what type* of defect exists.
 
 <div align="center">
   <img src="assets/results/pareto_frontier.png" alt="Pareto Frontier (Latency vs AUROC)" style="max-width: 90%; width: auto;"/>
@@ -1916,7 +1916,7 @@ This chapter presents the actual deployment artifact resulting from the theoreti
 
 ## 9.1 Web Application Interface
 
-The local web interface allows quality assurance operators to upload single or batch product images, automatically classifying the item using YOLOv8, running multi-modal inference, and generating Explainable AI (XAI) reports in sub-second speeds.
+The local web interface (Figure 9.1) allows quality assurance operators to upload single or batch product images, automatically classifying the item using YOLOv8, running multi-modal inference, and generating Explainable AI (XAI) reports in sub-second speeds.
 
 <div align="center">
   <img src="assets/demo/main_interface.png" alt="IAD Web Interface Screenshot" style="max-width: 90%; width: auto; border: 1px solid #ccc;"/>
@@ -1926,7 +1926,7 @@ The local web interface allows quality assurance operators to upload single or b
 
 ## 9.2 Explainable AI & Grad-CAM in Action
 
-The true utility of the proposed system comes from its ability to visually locate defects dynamically alongside a generative chatbot assistant that explains the scores.
+The true utility of the proposed system comes from its ability to visually locate defects dynamically, as demonstrated in Figure 9.2, alongside a generative chatbot assistant that explains the scores.
 
 <div align="center">
   <img src="assets/demo/heatmap_detection.png" alt="Heatmap Anomaly Detection" style="max-width: 60%; width: auto; border: 1px solid #ccc;"/>
@@ -1935,6 +1935,8 @@ The true utility of the proposed system comes from its ability to visually locat
 </div>
 
 ## 9.3 Expert System Chatbot
+
+The Expert System Chatbot (Figure 9.3) serves as the final interpretive layer, translating numerical anomaly scores and heatmap outputs into natural-language diagnostic reports for non-technical operators.
 
 <div align="center">
   <img src="assets/demo/chatbot_assistant.png" alt="XAI Chatbot Assistant" style="max-width: 50%; width: auto; border: 1px solid #ccc;"/>
