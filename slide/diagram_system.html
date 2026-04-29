@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global System Architecture (Codebase Accurate)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@500&display=swap');
+        :root {
+            --bg: #0f172a; --bg2: #1e293b; --text: #f1f5f9; --muted: #94a3b8;
+            --accent: #6366f1; --accent2: #8b5cf6; --green: #22c55e; 
+            --red: #ef4444; --orange: #f59e0b; --cyan: #06b6d4; --gray: #475569;
+        }
+        body { 
+            overflow: hidden;
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            padding: 1rem 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 0;
+            min-height: 100vh;
+            justify-content: center;
+        }
+        .flowchart {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0 1rem;
+            box-sizing: border-box;
+        }
+        .node { 
+            background: var(--bg2); 
+            border: 2px solid var(--gray); 
+            border-radius: 8px; 
+            padding: 0.8rem 0.5rem; 
+            text-align: center; 
+            width: 180px; 
+            position: relative; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+            flex-shrink: 0;
+        }
+        .node-title { font-weight: 800; font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tensor { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--accent2); background: rgba(139, 92, 246, 0.1); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 0.5rem; word-break: break-word;}
+        .desc { font-size: 0.75rem; color: var(--muted); line-height: 1.3; }
+        
+        .arrow-right { 
+            height: 3px; 
+            width: 25px; 
+            background: var(--gray); 
+            position: relative; 
+            flex-shrink: 0;
+            margin: 0 5px;
+        }
+        .arrow-right::after { 
+            content: ''; 
+            position: absolute; 
+            right: -2px; 
+            top: -4px; 
+            border-width: 5px 0 5px 6px; 
+            border-style: solid; 
+            border-color: transparent transparent transparent var(--gray); 
+        }
+        
+        /* Node Colors */
+        .n-input { border-color: var(--cyan); } .n-input .node-title { color: var(--cyan); }
+        .n-prep { border-color: var(--orange); } .n-prep .node-title { color: var(--orange); }
+        .n-yolo { border-color: var(--green); border-radius: 20px; } .n-yolo .node-title { color: var(--green); }
+        .n-eval { border-color: var(--red); border-radius: 20px; } .n-eval .node-title { color: var(--red); }
+        .n-out { border-color: #f8fafc; }
+        
+        .parallel-box { 
+            border: 2px dashed #334155; 
+            border-radius: 12px; 
+            padding: 2rem 1rem 1rem 1rem; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            position: relative; 
+            flex-shrink: 0;
+        }
+        .parallel-label { 
+            position: absolute; 
+            top: -10px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: var(--bg); 
+            padding: 0 10px; 
+            font-weight: 800; 
+            color: #cbd5e1; 
+            font-size: 0.75rem; 
+            letter-spacing: 1px; 
+            white-space: nowrap;
+        }
+        
+        .m-pc { border-color: var(--accent); } .m-pc .node-title { color: var(--accent); }
+        .m-ae { border-color: #d946ef; } .m-ae .node-title { color: #d946ef; }
+        .m-svm { border-color: #10b981; } .m-svm .node-title { color: #10b981; }
+    </style>
+</head>
+<body>
+    <h2 style="margin-bottom: 2rem; color: white; text-align:center;">Global System Architecture (Ground Truth)</h2>
+
+    <div class="flowchart">
+        <div class="node n-input">
+            <div class="node-title">1. RGB Input</div>
+            <div class="tensor">Input: (B, 3, 256, 256)</div>
+            <div class="desc">Raw industrial sensor feed.</div>
+        </div>
+        
+        <div class="arrow-right"></div>
+        
+        <div class="node n-prep">
+            <div class="node-title">2. Pre-processing</div>
+            <div class="desc">
+                <strong style="color:var(--text)">OpenCV:</strong> CLAHE + Unsharp Mask<br>
+                <strong style="color:var(--text)">Torchvision:</strong> Resize -> Normalize
+            </div>
+        </div>
+
+        <div class="arrow-right"></div>
+
+        <div class="node n-yolo">
+            <div class="node-title">3. YOLO Router</div>
+            <div class="desc">
+                <strong>Model:</strong> ultralytics YOLOv8n<br>
+                <strong>Task:</strong> 15-class<br>
+                <strong>Logic:</strong> conf > 0.65 threshold.
+            </div>
+        </div>
+
+        <div class="arrow-right"></div>
+
+        <div class="parallel-box">
+            <div class="parallel-label">ThreadPoolExecutor(workers=3)</div>
+            
+            <div class="node m-pc" style="width:220px; padding: 0.6rem;">
+                <div class="node-title">PatchCore Core</div>
+                <div style="font-size:0.7rem; margin-bottom:3px; color:#cbd5e1;">L2(128)+L3(256) → (384)</div>
+                <div class="desc">k-Center Greedy (10%)<br>PyTorchLSHIndex<br><strong>Dense k-NN Map</strong></div>
+            </div>
+            <div class="node m-ae" style="width:220px; padding: 0.6rem;">
+                <div class="node-title">Autoencoder</div>
+                <div style="font-size:0.7rem; margin-bottom:3px; color:#cbd5e1;">5 Encoder → 5 Decoder</div>
+                <div class="desc">MSE distance vs Input<br><strong>Pixel Error Map</strong></div>
+            </div>
+            <div class="node m-svm" style="width:220px; padding: 0.6rem;">
+                <div class="node-title">CNN + OC-SVM</div>
+                <div style="font-size:0.7rem; margin-bottom:3px; color:#cbd5e1;">Std ResNet18 → AvgPool</div>
+                <div class="desc">1-Class SVM boundary<br>Grad-CAM Hook</div>
+            </div>
+        </div>
+
+        <div class="arrow-right"></div>
+
+        <div class="node n-eval" style="width: 170px;">
+            <div class="node-title">4. Decision Matrix</div>
+            <div class="desc">
+                <strong>Threshold:</strong> 99.5th Pctl.<br>
+                <strong>Factor:</strong> * 0.8 tolerance.
+            </div>
+        </div>
+
+        <div class="arrow-right"></div>
+
+        <div class="node n-out" style="width: 170px;">
+            <div class="node-title">5. UI Application</div>
+            <div class="desc">Binary Result, Heatmap Base64, Gemini XAI Bot.</div>
+        </div>
+    </div>
+</body>
+</html>
