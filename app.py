@@ -26,6 +26,7 @@ Execution:
 
 import base64
 import io
+import math
 import os
 import traceback
 
@@ -94,7 +95,6 @@ loaded_models = {}
 
 def load_optimal_threshold(category, model_name):
     import json
-    import math
 
     try:
         with open("checkpoints/thresholds.json", "r") as f:
@@ -105,6 +105,16 @@ def load_optimal_threshold(category, model_name):
             return val
     except Exception:
         return None
+
+
+def _safe_float(value, fallback=999999.0):
+    """Chặn Infinity/NaN trước khi serialize JSON — tránh crash frontend."""
+    if value is None:
+        return None
+    f = float(value)
+    if math.isinf(f) or math.isnan(f):
+        return fallback
+    return f
 
 
 def get_autoencoder(category):
@@ -358,9 +368,9 @@ def run_autoencoder_inference(img_tensor, category):
 
         return {
             "model": "Autoencoder",
-            "score": round(float(score), 6),
-            "threshold": round(float(threshold), 6) if threshold is not None else 0.5,
-            "anomaly_index": anomaly_index,
+            "score": round(_safe_float(score, 0.0), 6),
+            "threshold": round(_safe_float(threshold, 0.5), 6),
+            "anomaly_index": _safe_float(anomaly_index),
             "is_anomaly": bool(is_anomaly),
             "heatmap_b64": numpy_to_base64(error_norm, cmap="jet"),
             "overlay_b64": overlay_heatmap(img_np, error_norm),
@@ -427,9 +437,9 @@ def run_patchcore_inference(img_tensor, category):
 
         return {
             "model": "PatchCore",
-            "score": round(float(score), 6),
-            "threshold": round(float(threshold), 6) if threshold is not None else 0.5,
-            "anomaly_index": anomaly_index,
+            "score": round(_safe_float(score, 0.0), 6),
+            "threshold": round(_safe_float(threshold, 0.5), 6),
+            "anomaly_index": _safe_float(anomaly_index),
             "is_anomaly": bool(is_anomaly),
             "heatmap_b64": numpy_to_base64(amap_resized, cmap="jet"),
             "overlay_b64": overlay_heatmap(img_np, amap_resized),
@@ -509,9 +519,9 @@ def run_ocsvm_inference(img_tensor, category):
 
     return {
         "model": "CNN+OC-SVM",
-        "score": round(float(score), 6),
-        "threshold": round(float(threshold), 6) if threshold else 0.0,
-        "anomaly_index": anomaly_index,
+        "score": round(_safe_float(score, 0.0), 6),
+        "threshold": round(_safe_float(threshold, 0.0), 6),
+        "anomaly_index": _safe_float(anomaly_index),
         "is_anomaly": bool(is_anomaly),
         "input_b64": numpy_to_base64(img_np),
         "heatmap_b64": heatmap_b64,

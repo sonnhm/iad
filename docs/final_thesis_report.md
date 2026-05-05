@@ -326,7 +326,7 @@ None of these off-the-shelf solutions are specifically designed for the PatchCor
 
 ## 2.4 Positioning of This Work
 
-The following table summarizes the paradigm comparison and positions our contributions:
+Table 2.1 summarizes the paradigm comparison and positions our contributions:
 
 | Criterion | Autoencoder | OC-SVM | PatchCore | **Ours** |
 |:---|:---|:---|:---|:---|
@@ -384,7 +384,7 @@ The terminal spatial dimension of $8 \times 8$ is compatible with ResNet's globa
 
 ### 3.1.2 Channel Normalization: ImageNet Statistics as a Prior
 
-Each input tensor undergoes channel-wise normalization:
+Each input tensor undergoes channel-wise normalization, as shown in Table 3.1:
 
 $$x_c^{\text{norm}} = \frac{x_c - \mu_c}{\sigma_c}$$
 
@@ -461,7 +461,7 @@ Layer 2 introduces a **dimension transition**: the channel count doubles from 64
 
 ## 3.4 Layer Selection for PatchCore: A Principled Trade-Off
 
-PatchCore hooks into the backbone at **Layer 2 and Layer 3** (not Layer 1 or Layer 4). This choice is not arbitrary — it reflects a precise trade-off along the abstraction hierarchy:
+PatchCore hooks into the backbone at **Layer 2 and Layer 3** (not Layer 1 or Layer 4). This choice is not arbitrary — it reflects a precise trade-off along the abstraction hierarchy, as detailed in Table 3.2:
 
 | Layer | Channels | Spatial | Receptive Field | Feature Type | AD Relevance |
 |:---|:---|:---|:---|:---|:---|
@@ -493,7 +493,7 @@ The distillation is performed across all four residual layers ($l \in \{1,2,3,4\
 
 ## 3.6 Computational Cost Analysis
 
-The backbone forward pass represents a fixed cost per image, independent of memory bank size or search algorithm. For ResNet-18 at 256×256 input resolution:
+The backbone forward pass represents a fixed cost per image, independent of memory bank size or search algorithm. The computational cost per stage for ResNet-18 at 256×256 input resolution is summarized in Table 3.3:
 
 | Stage | Output Shape | Multiply-Accumulate (MAC) Operations |
 |:---|:---|:---|
@@ -627,7 +627,7 @@ The theoretical bound suggests $d' = 9{,}016$ for $\epsilon = 0.1$ — far large
 
 ### 4.4.5 Coreset Ratio: The Accuracy-Efficiency Trade-Off
 
-The coreset ratio $r = N_c / N$ is the single most important hyperparameter controlling the trade-off between memory bank quality and system efficiency:
+The coreset ratio $r = N_c / N$ is the single most important hyperparameter controlling the trade-off between memory bank quality and system efficiency, and its impact is summarized in Table 4.1:
 
 | Coreset Ratio | Coreset Size | Memory (MB) | Search FLOPs (per image) | Expected AUROC Impact |
 |:---|:---|:---|:---|:---|
@@ -821,7 +821,7 @@ distances = torch.clamp(distances, min=0.0)
 
 ### 5.4.5 Combined Speedup Analysis
 
-The total inference pipeline acceleration from both optimizations:
+The total inference pipeline acceleration from both optimizations is summarized in Table 5.2:
 
 | Component | Exact Search | LSH + XOR | Speedup |
 |:---|:---|:---|:---|
@@ -892,7 +892,7 @@ This engineering detail is essential for production deployment where multiple in
 
 ## 6.2 The Threshold Problem: Why Raw Scores Are Insufficient
 
-Each model in our pipeline (PatchCore, Autoencoder, CNN-OCSVM) operates in a different metric space with fundamentally different score characteristics:
+Each model in our pipeline (PatchCore, Autoencoder, CNN-OCSVM) operates in a different metric space with fundamentally different score characteristics, as illustrated in Table 6.1:
 
 | Model | Score Semantics | Typical Normal Range | Typical Anomaly Range | Units |
 |:---|:---|:---|:---|:---|
@@ -961,7 +961,7 @@ The Anomaly Index assumes that the relationship between raw score magnitude and 
 
 ## 6.5 Risk Severity Mapping for Industrial Deployment
 
-The Anomaly Index is mapped to a discrete severity classification:
+The Anomaly Index is mapped to a discrete severity classification, as detailed in Table 6.2:
 
 | Anomaly Index | Risk Level | Color Code | Industrial Action |
 |:---|:---|:---|:---|
@@ -978,7 +978,7 @@ The 0.8 warning boundary represents a 20% margin below the optimal decision boun
 
 ## 6.6 Sequential Batch Processing: Engineering for VRAM Constraints
 
-The system must operate within a strict 6GB VRAM budget. The memory allocation at inference time is:
+The system must operate within a strict 6GB VRAM budget. The memory allocation at inference time is summarized in Table 6.3:
 
 | Component | Memory (MB) | Lifetime |
 |:---|:---|:---|
@@ -1068,7 +1068,7 @@ The system described in Chapters 3–6 is a **static pipeline**: once the corese
 
 ### 7.1.1 Category-Specific Optimal Configurations
 
-The PatchCore pipeline exposes several hyperparameters whose optimal values vary significantly across product categories:
+The PatchCore pipeline exposes several hyperparameters whose optimal values vary significantly across product categories, as shown in Table 7.1:
 
 | Hyperparameter | Effect | Optimal Range Varies Because |
 |:---|:---|:---|
@@ -1188,7 +1188,7 @@ The XAI layer positions the system within the **Human-in-the-Loop ML** paradigm,
 
 ## 7.6 Cross-Module Interaction: Agentic Layer × Pipeline
 
-The agentic optimization layer interacts with every preceding component:
+The agentic optimization layer interacts with every preceding component, as analyzed in Table 7.2:
 
 | Interaction | Mechanism | Impact |
 |:---|:---|:---|
@@ -1219,7 +1219,7 @@ This chapter presents the empirical evaluation of the proposed system across all
 
 ## 8.1 Experimental Setup
 
-The MVTec Anomaly Detection dataset [3] (Bergmann et al., 2019) is the standard benchmark for unsupervised anomaly detection in industrial images. It consists of 15 categories divided into two groups — five Textures (Carpet, Grid, Leather, Tile, Wood) and ten Objects (Bottle, Cable, Capsule, Hazelnut, Metal Nut, Pill, Screw, Toothbrush, Transistor, Zipper):
+The MVTec Anomaly Detection dataset [3] (Bergmann et al., 2019) is the standard benchmark for unsupervised anomaly detection in industrial images. It consists of 15 categories, as summarized in Table 8.1:
 
 | Statistic | Value |
 |:---|:---|
@@ -1241,7 +1241,7 @@ The MVTec Anomaly Detection dataset [3] (Bergmann et al., 2019) is the standard 
 
 As shown in Figure 8.1, each category contains between 60 and 391 training images, all guaranteed to be defect-free. The test set includes both normal and anomalous samples, with pixel-level ground-truth masks for anomalous images. The defect types span a wide range of visual characteristics: structural (broken, bent), surface (scratch, contamination), and color (stain, discoloration).
 
-All experiments are conducted on a single workstation:
+All experiments are conducted on a single workstation, as specified in Table 8.2:
 
 | Component | Specification |
 |:---|:---|
@@ -1286,7 +1286,7 @@ The following table summarizes the implementation details for each model archite
 
 ## 8.2 Pipeline Evolution: From V1 to V5
 
-A critical aspect of this thesis is the engineering journey from a naive implementation to the optimized system. We document this evolution to demonstrate the cumulative impact of each optimization:
+A critical aspect of this thesis is the engineering journey from a naive implementation to the optimized system. We document this evolution in Table 8.5 to demonstrate the cumulative impact of each optimization:
 
 | Version | Key Change | Status | Typical Latency | VRAM |
 |:---|:---|:---|:---|:---|
@@ -1353,7 +1353,7 @@ PatchCore achieves the highest image-level AUROC on 7 categories — Hazelnut (0
 
 ## 8.4 SOTA Benchmarking
 
-Comparative analysis against published state-of-the-art architectures:
+Comparative analysis against published state-of-the-art architectures is shown in Table 8.7:
 
 | Method | Year | Backbone | Mean Image AUROC | Inference | VRAM |
 |:---|:---:|:---|:---:|:---:|:---|
@@ -1386,7 +1386,7 @@ As depicted in Figure 8.4, our system occupies a previously empty region of the 
 
 ### 8.5.1 Effect of Coreset Ratio
 
-The actual coreset ratios used across categories, as determined by the Agentic ML optimization loop (Chapter 7), provide a natural ablation study:
+The actual coreset ratios used across categories, as determined by the Agentic ML optimization loop (Chapter 7), provide a natural ablation study, as summarized in Table 8.8a:
 
 | Coreset Regime | Categories | Avg. Image AUROC | Avg. Pixel AUROC | Inference Profile |
 |:---|:---|:---:|:---:|:---|
@@ -1399,7 +1399,7 @@ The actual coreset ratios used across categories, as determined by the Agentic M
 
 **Finding:** The ultra-aggressive 0.5% coreset regime produces the lowest image-level AUROC (mean 0.641) but, remarkably, the **highest** mean Pixel AUROC (0.876). This paradox has a clear explanation: with fewer coreset vectors, only the most representative "prototype" patches survive selection. When a test patch is anomalous, its distance to the nearest prototype is large and spatially precise — the localization signal is strong even though the binary classification threshold may be poorly calibrated. The moderate regime (5–9%) achieves the best image-level AUROC (0.834), suggesting that the Agentic optimizer should converge on this range for most categories.
 
-### 8.5.2 Effect of LSH Configuration
+The effect of different LSH configurations on search performance is shown in Table 8.8b:
 
 | Configuration | Mean AUROC | Mean Latency (ms) | Recall@1 (estimated) |
 |:---|:---:|:---:|:---:|
@@ -1414,7 +1414,7 @@ The actual coreset ratios used across categories, as determined by the Agentic M
 
 **Finding:** XOR-Probe is essential. Without it, the LSH approximation degrades AUROC by 2-3%. With XOR-Probe at 12 bits, the accuracy loss is reduced to 0.002 — statistically insignificant on most categories. Increasing to 16 bits provides negligible improvement while increasing the number of probed buckets from 13 to 17.
 
-### 8.5.3 Effect of Knowledge Distillation
+The impact of Knowledge Distillation on backbone quality is detailed in Table 8.8c:
 
 | Backbone | Mean Image AUROC | Backbone Latency (ms) | Parameters | VRAM Fit (6GB) |
 |:---|:---:|:---:|:---:|:---:|
@@ -1430,7 +1430,7 @@ The actual coreset ratios used across categories, as determined by the Agentic M
 
 **Finding:** Knowledge Distillation provides a +0.012 AUROC improvement over the frozen ResNet-18 baseline (0.724 → 0.736) while slightly reducing inference time through architectural optimization of the Student network. While this improvement appears modest in absolute terms, it is significant given the constrained capacity of the 384-D embedding space. The KD-trained CustomResNet18 achieves functional deployment at **14% of WideResNet-50's parameter count** — the only configuration that fits within the 6GB VRAM constraint with coreset, LSH index, and CUDA overhead.
 
-### 8.5.4 Dimensionality Reduction via Random Projection
+The results of dimensionality reduction via random projection are summarized in Table 8.8d:
 
 | Embedding Dimension | Mean AUROC | Search Cost Relative | Memory Bank Size |
 |:---|:---:|:---:|:---:|
@@ -1729,7 +1729,7 @@ The complete system employs a multi-threaded initialization architecture using `
 
 ## Appendix B: Optimized Hyperparameter Table
 
-Default hyperparameters for the Enhanced PatchCore system, organized by component:
+Default hyperparameters for the Enhanced PatchCore system are detailed in Table A.1:
 
 | Component | Parameter | Default Value | Valid Range | Tuned by Agent |
 |:---|:---|:---|:---|:---:|
@@ -1777,7 +1777,7 @@ Compared to exact search: $10{,}240 \times 384 = 3{,}932{,}160$ FLOPs.
 
 ---
 
-## Appendix D: Glossary of Key Terms
+An extended glossary of technical terms is summarized in Table A.2:
 
 | Term | Definition |
 |:---|:---|

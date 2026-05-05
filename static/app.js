@@ -227,12 +227,12 @@ function renderBatchResults(batchResults) {
             errorCount++;
             return;
         }
-        // Determine verdict from first available result
-        const primaryResult = item.results && item.results[0];
-        if (primaryResult) {
-            if (primaryResult.is_anomaly) anomalyCount++;
-            else normalCount++;
-        }
+        // Majority voting: đa số model đồng ý mới tính là anomaly (≥ 2/3)
+        const validResults = item.results ? item.results.filter(r => !r.error) : [];
+        const anomalyVotes = validResults.filter(r => r.is_anomaly).length;
+        const hasAnomaly = anomalyVotes > validResults.length / 2;
+        if (hasAnomaly) anomalyCount++;
+        else if (validResults.length > 0) normalCount++;
     });
 
     const validCount  = normalCount + anomalyCount;
@@ -276,9 +276,11 @@ function renderBatchResults(batchResults) {
     });
 
     // ——— 3. Set chatbot context to first anomaly (or first result) ———
-    const firstAnomaly = batchResults.find(item =>
-        item.results && item.results[0] && item.results[0].is_anomaly
-    );
+    const firstAnomaly = batchResults.find(item => {
+        const valid = item.results ? item.results.filter(r => !r.error) : [];
+        const votes = valid.filter(r => r.is_anomaly).length;
+        return votes > valid.length / 2;
+    });
     const contextSource = firstAnomaly || batchResults.find(item => item.results && item.results[0]);
     if (contextSource) {
         const r = contextSource.results[0];
@@ -302,13 +304,12 @@ function renderBatchResults(batchResults) {
         if (item.error) {
             headerBadgeHTML = `<span class="result-badge badge-anomaly"> Lỗi xử lý</span>`;
         } else {
-            const primary = item.results && item.results[0];
-            if (primary) {
-                const isAno = primary.is_anomaly;
-                headerBadgeHTML = `<span class="result-badge ${isAno ? 'badge-anomaly' : 'badge-normal'}">
-                    ${isAno ? ' ANOMALY' : ' NORMAL'}
-                </span>`;
-            }
+            const validRes = item.results ? item.results.filter(r => !r.error) : [];
+            const anoVotes = validRes.filter(r => r.is_anomaly).length;
+            const hasAno = anoVotes > validRes.length / 2;
+            headerBadgeHTML = `<span class="result-badge ${hasAno ? 'badge-anomaly' : 'badge-normal'}">
+                ${hasAno ? ' ANOMALY' : ' NORMAL'}
+            </span>`;
         }
 
         // Warning
