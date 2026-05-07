@@ -29,8 +29,12 @@
 
 <div style="page-break-after: always;"></div>
 
+<div style="page-break-after: always;"></div>
+
 ## Acknowledgements
 We would like to express our sincere gratitude to our academic advisor Mr. DAO DUY PHUONG and Mr. NGUYEN QUOC TIEN for their dedicated guidance and for providing a solid foundation of knowledge throughout the execution of this Graduation Project. Their expertise, constructive feedback, and dedication have been essential in shaping the direction and quality of our work. We are sincerely thankful for the time and effort they devoted to mentoring us, helping us overcome challenges, and motivating us to push beyond our limits. Without their continued assistance, this project would not have been possible. We would like to thank our friends and families for their patience, understanding, and encouragement throughout this journey. Finally, we would like to thank our university providing the academic environment, resources, and opportunities necessary for us to complete this research.
+
+<div style="page-break-after: always;"></div>
 
 <div style="page-break-after: always;"></div>
 
@@ -39,61 +43,18 @@ Artificial Intelligence optical inspection is rapidly becoming a mandatory stand
 
 <div style="page-break-after: always;"></div>
 
-## Table of Contents
-* **CHAPTER 1: INTRODUCTION**
-* **CHAPTER 2: RELATED WORK**
-* **CHAPTER 3: FEATURE BACKBONE**
-* **CHAPTER 4: THE PATCHCORE ENGINE**
-* **CHAPTER 5: OPTIMIZATION INTERNALS**
-* **CHAPTER 6: SYSTEM PIPELINE & CALIBRATION**
-* **CHAPTER 7: AGENTIC ML & EXPLAINABLE AI**
-* **CHAPTER 8: EXPERIMENTS & EVALUATION**
-* **CHAPTER 9: SYSTEM DEMONSTRATION**
-* **CHAPTER 10: PROJECT MANAGEMENT PLAN**
-* **CHAPTER 11: CONCLUSION & FUTURE WORK**
-* **REFERENCES**
-* **APPENDICES**
-
 <div style="page-break-after: always;"></div>
 
-## LIST OF FIGURES
-- Figure 3.1: Tensor-level feature extraction and Knowledge Distillation pipeline for the CustomResNet-18 backbone
-- Figure 4.1: The PatchCore memory engine: from multi-scale feature extraction to coreset construction and anomaly scoring
-- Figure 6.1: End-to-end industrial inference pipeline featuring CLAHE preprocessing, YOLOv8 routing, parallel execution, and Anomaly Index calibration
-- Figure 8.1: Examples from the MVTec AD dataset comparing nominal samples with defective variants across Texture and Object categories
-- Figure 8.2: Receiver Operating Characteristic (ROC) curve comparison across models and selected MVTec AD categories
-- Figure 8.3: Anomaly Localization Capability — Image-Level vs Pixel-Level AUROC comparison
-- Figure 8.4: Accuracy-Latency-Memory Pareto frontier for Industrial Anomaly Detection systems
-- Figure 9.1: Main dashboard of the Industrial Anomaly Detection web application
-- Figure 9.2: The system detecting a micro-defect with PatchCore/Grad-CAM heatmap overlay
-- Figure 9.3: The IAD Assistant Chatbot interpreting results and advising the user
-
-## LIST OF TABLES
-- Table 2.1: Paradigm comparison and positioning of contributions
-- Table 3.1: ImageNet normalization constants per channel
-- Table 3.2: Layer selection trade-off for PatchCore
-- Table 3.3: Computational cost analysis by backbone stage
-- Table 4.1: Coreset ratio vs accuracy-efficiency trade-off
-- Table 5.1: Decomposed squared Euclidean distance computation strategy
-- Table 5.2: Combined speedup analysis of LSH + XOR-Probe vs exact search
-- Table 6.1: Score distribution heterogeneity across models
-- Table 6.2: Risk severity mapping for industrial deployment
-- Table 6.3: VRAM memory budget breakdown
-- Table 7.1: Category-specific hyperparameter sensitivity
-- Table 7.2: Cross-module interaction analysis
-- Table 8.1: MVTec AD dataset statistics
-- Table 8.2: Hardware configuration
-- Table 8.3: Evaluation metrics summary
-- Table 8.4: Implementation details per model
-- Table 8.5: Pipeline evolution from V1 to V5
-- Table 8.6: Image-level AUROC by category
-- Table 8.7: SOTA benchmarking comparison
-- Table 8.8: Ablation study results (coreset ratio, LSH, KD, dimensionality, agentic)
-- Table 8.9: Latency profiling breakdown
-- Table 10.1: Research team structure and responsibilities
-- Table 10.2: Project schedule and milestone orchestration
-- Table A.1: Complete system configuration parameters
-- Table A.2: Extended glossary of technical terms
+## Table of Contents
+* **I. Project Introduction**
+* **II. Project Management Plan**
+* **III. Existing Systems/State of the Art**
+* **IV. Methodology**
+* **V. System Design and Implementation**
+* **VI. Results and Discussion**
+* **VII. Conclusion**
+* **VIII. References**
+* **IX. Appendices**
 
 <div style="page-break-after: always;"></div>
 
@@ -125,39 +86,66 @@ Artificial Intelligence optical inspection is rapidly becoming a mandatory stand
 
 <div style="page-break-after: always;"></div>
 
-# CHAPTER 1: INTRODUCTION
+<div style="page-break-after: always;"></div>
 
-## 1.1 The Industrial Quality Assurance Problem
+## LIST OF TABLES
+- Table 2.1: Paradigm comparison and positioning of contributions
+- Table 3.1: ImageNet normalization constants per channel
+- Table 3.2: Layer selection trade-off for PatchCore
+- Table 3.3: Computational cost analysis by backbone stage
+- Table 4.1: Coreset ratio vs accuracy-efficiency trade-off
+- Table 5.1: Decomposed squared Euclidean distance computation strategy
+- Table 5.2: Combined speedup analysis of LSH + XOR-Probe vs exact search
+- Table 6.1: Score distribution heterogeneity across models
+- Table 6.2: Risk severity mapping for industrial deployment
+- Table 6.3: VRAM memory budget breakdown
+- Table 7.1: Category-specific hyperparameter sensitivity
+- Table 7.2: Cross-module interaction analysis
+- Table 8.1: MVTec AD dataset statistics
+- Table 8.2: Hardware configuration
+- Table 8.3: Evaluation metrics summary
+- Table 8.4: Implementation details per model
+- Table 8.5: Pipeline evolution from V1 to V5
+- Table 8.6: Image-level AUROC by category
+- Table 8.7: SOTA benchmarking comparison
+- Table 8.8: Ablation study results (coreset ratio, LSH, KD, dimensionality, agentic)
+- Table 8.9: Latency profiling breakdown
+- Table 10.1: Research team structure and responsibilities
+- Table 10.2: Project schedule and milestone orchestration
+- Table A.1: Complete system configuration parameters
+- Table A.2: Extended glossary of technical terms
 
-Modern manufacturing operates under a fundamental constraint: the tension between throughput velocity and defect containment. A single production line for consumer electronics or automotive components may produce tens of thousands of units per hour, yet a defect rate as low as 0.01% can translate to hundreds of faulty products reaching end users daily. Traditional quality assurance relies on human visual inspectors — operators who examine surfaces, textures, and structural integrity under controlled lighting conditions. This approach suffers from three well-documented failure modes:
+<div style="page-break-after: always;"></div>
 
-1. **Fatigue-induced miss rate**: Human visual acuity degrades measurably after 20–30 minutes of continuous inspection. Studies in manufacturing inspection [21] report inspector miss rates increasing from approximately 5% to over 30% during extended shifts, particularly for micro-scale surface defects (scratches below 0.5mm, hairline cracks, subtle discoloration).
+<div style="page-break-after: always;"></div>
 
-2. **Subjectivity and inter-operator variance**: The decision boundary between "acceptable" and "defective" is implicitly encoded in each inspector's experience. This produces inconsistent reject rates across shifts and facilities, making quality metrics unreliable for process control.
+## LIST OF FIGURES
+- Figure 3.1: Tensor-level feature extraction and Knowledge Distillation pipeline for the CustomResNet-18 backbone
+- Figure 4.1: The PatchCore memory engine: from multi-scale feature extraction to coreset construction and anomaly scoring
+- Figure 6.1: End-to-end industrial inference pipeline featuring CLAHE preprocessing, YOLOv8 routing, parallel execution, and Anomaly Index calibration
+- Figure 8.1: Examples from the MVTec AD dataset comparing nominal samples with defective variants across Texture and Object categories
+- Figure 8.2: Receiver Operating Characteristic (ROC) curve comparison across models and selected MVTec AD categories
+- Figure 8.3: Anomaly Localization Capability — Image-Level vs Pixel-Level AUROC comparison
+- Figure 8.4: Accuracy-Latency-Memory Pareto frontier for Industrial Anomaly Detection systems
+- Figure 9.1: Main dashboard of the Industrial Anomaly Detection web application
+- Figure 9.2: The system detecting a micro-defect with PatchCore/Grad-CAM heatmap overlay
+- Figure 9.3: The IAD Assistant Chatbot interpreting results and advising the user
 
-3. **Scalability ceiling**: Hiring and training qualified inspectors does not scale linearly with production volume. The cost-per-inspection rises disproportionately as product complexity increases.
+<div style="page-break-after: always;"></div>
 
-These constraints motivate the adoption of automated visual inspection systems. However, the transition from human judgment to machine-driven anomaly detection introduces a distinct set of technical challenges that conventional supervised learning frameworks are poorly equipped to address.
+# I. Project Introduction
 
-## 1.2 The Anomaly Detection Paradox: Why Supervised Learning Fails
+## 1. Overview
+### 1.1 Project Information
+The details regarding project code, group code, and research team members are provided on the Cover Page.
 
-The naive formulation of defect detection as a binary classification problem (normal vs. defective) appears straightforward. In practice, it collapses under a structural data constraint that we term the **Anomaly Paradox**:
-
-> Anomalies are, by definition, rare and unpredictable. A system that requires labeled examples of every possible defect type cannot generalize to defects it has never observed.
-
-This paradox manifests in three concrete ways that collectively render supervised approaches infeasible for general-purpose industrial inspection.
-
-The first is *class imbalance*: in real manufacturing datasets, defective samples constitute fewer than 1–5% of total production. Standard classification architectures such as ResNet [1] and EfficientNet [25], when trained on such skewed distributions, develop a strong bias toward the majority class, achieving high overall accuracy while catastrophically failing on the minority class — the very class that matters for quality assurance.
-
-The second manifestation is the *open-set nature of defects*. Unlike object recognition tasks where the class vocabulary is fixed, industrial defects are inherently open-set. A model trained to recognize scratches may encounter a novel defect type — contamination, deformation, or misalignment — that lies entirely outside its training distribution. Supervised models, by construction, cannot flag what they have not been taught to recognize, making them fundamentally unsuitable for environments where new defect types emerge unpredictably.
-
-The third obstacle is *annotation cost*. Acquiring pixel-level defect annotations for supervised segmentation requires domain experts to manually delineate irregular defect boundaries. For a dataset spanning 15 product categories with multiple defect subtypes, this annotation effort becomes prohibitively expensive and non-transferable across product lines.
-
-These three factors collectively eliminate supervised classification and segmentation as viable paradigms for general-purpose industrial anomaly detection. The field has therefore converged on **Unsupervised Anomaly Detection (UAD)**: systems that learn exclusively from defect-free (nominal) samples and flag deviations from the learned normality distribution at inference time.
+### 1.2 Project Overview
 
 
-## 1.3 Research Problem & Challenges: The Inference Efficiency Gap
+## 2. Project Background
+Modern manufacturing operates under a fundamental constraint: the tension between throughput velocity and defect containment. Traditional quality assurance relies on human visual inspectors, which suffers from fatigue-induced miss rates, subjectivity, and scalability ceilings. These constraints motivate the adoption of automated visual inspection systems. However, the transition from human judgment to machine-driven anomaly detection introduces a distinct set of technical challenges.
 
+## 3. Project Objective
 The specific research problem addressed in this thesis can be stated precisely:
 
 > **How can we maintain PatchCore's [2] near-perfect anomaly detection accuracy while reducing its inference-time computational cost to levels suitable for real-time deployment on resource-constrained industrial hardware (≤ 6GB VRAM)?**
@@ -178,8 +166,10 @@ To guide the investigation, we formulate three research questions:
 
 These constraints define a three-dimensional optimization space (accuracy × speed × memory) where improvements along one axis typically degrade another. The key insight of this work is that by introducing **approximate search structures** (Locality-Sensitive Hashing with XOR-Probe) and **hardware-aware distance computation** (matrix decomposition for GPU Tensor Cores), we can shift the Pareto frontier — achieving near-exact accuracy at dramatically reduced computational cost.
 
-## 1.4 Proposed System & Contributions
+## 4. Problem Statement
+The naive formulation of defect detection as a binary classification problem fails due to the **Anomaly Paradox**: Anomalies are, by definition, rare and unpredictable. This manifests in three ways: class imbalance, the open-set nature of defects, and annotation cost. These factors collectively eliminate supervised classification as a viable paradigm for general-purpose industrial inspection. The field has therefore converged on **Unsupervised Anomaly Detection (UAD)**.
 
+## 5. Significance of the Project
 This thesis presents an **end-to-end industrial anomaly detection system** that extends the PatchCore [2] framework with three categories of contribution, each addressing a specific limitation identified in Section 1.3.
 
 The first and primary contribution is an *Accelerated Approximate Search via LSH + XOR-Probe*. We replace PatchCore's [2] exhaustive nearest-neighbor search with a Locality-Sensitive Hashing (LSH) index [8, 23] that maps 384-dimensional feature vectors to 12-bit binary hash codes, partitioning the memory bank into 4,096 buckets. To mitigate the boundary-error problem inherent in LSH (where nearby vectors are separated by a hash boundary), we introduce an **XOR-Probe** mechanism that searches not only the exact hash bucket but also all Hamming-adjacent buckets (distance = 1). This achieves high recall (94.8%) with minimal accuracy degradation (see Chapter 8) while reducing search complexity from $O(N)$ to approximately $O(N/4096 \times 13)$ — a reduction factor of approximately 300×.
@@ -190,8 +180,7 @@ The third contribution is an *Agentic Hyperparameter Optimization* system. We in
 
 Critically, these contributions are not independent modules bolted onto PatchCore [2]; they form a **vertically integrated pipeline** where each layer's design is informed by the constraints of adjacent layers. The LSH index structure is designed around the 384-dimensional feature vectors produced by the backbone's hierarchical fusion. The threshold calibration operates on the distance distribution shaped by the coreset selection. The agentic optimizer adjusts parameters that propagate through all layers simultaneously. This system-level co-design is a central theme of the thesis.
 
-## 1.5 Thesis Organization
-
+## 6. Project Scope & Limitations
 The remainder of this thesis is organized as follows:
 
 - **Chapter 2 (Related Work)** provides a critical analysis of reconstruction-based, distribution-based, and embedding-based anomaly detection methods, establishing the theoretical foundations for each paradigm and identifying their specific failure modes that motivate PatchCore's [2] design.
@@ -212,28 +201,56 @@ The remainder of this thesis is organized as follows:
 
 ---
 
-# CHAPTER 2: RELATED WORK — A Critical Analysis of Unsupervised Anomaly Detection Paradigms
+<div style="page-break-after: always;"></div>
+
+# II. Project Management Plan
+
+To systematically achieve the rigorous objectives outlined above, a formalized project management governance structure was established. This chapter elucidates the distribution of analytical and engineering workloads across the research team, ensuring chronological consistency and theoretical integrity throughout the thesis duration.
+
+## 10.1 Research Team Structure and Responsibilities
+
+The execution paradigm was decentralized, mapping specific algorithmic capabilities directly to individual core competencies within the triad of the research group.
+
+| Role | Member Name | Core Academic & Engineering Responsibilities |
+|:---|:---|:---|
+| **Project Lead & AI Architect** | NGUYEN HOANG MINH SON | Principal architect of the LSH-accelerated PatchCore engine. Designed the Agentic hyperparameter optimization loop and the mathematical underpinnings of the Anomaly Index $\tau^*$. Led theoretical validation. |
+| **Data Engineer & ML Researcher** | NGUYEN DANG THAI BINH & ON NGUYEN THIEN PHUC | Directed the Knowledge Distillation pipeline for the CustomResNet-18 backbone. Architected the CNN+OC-SVM integration logic and formalized the MVTec AD batch processing workflow. |
+| **Software Engineer & XAI Integrator** | LE THANH THAO NHI | Consolidated the standalone algorithms into a continuous Flask production codebase. Engineered the Grad-CAM visualization bridging and the Gemini Explainable AI conversational interface. |
+
+<p align="center"><em>Table 10.1: Research team structure and responsibilities.</em></p>
 
 
+## 10.2 Project Schedule and Milestone Orchestration
 
-This chapter provides a structured review of the three dominant paradigms in unsupervised visual anomaly detection. Rather than cataloguing methods chronologically, we organize the literature by the **mathematical hypothesis** each paradigm adopts to define normality. This organization serves two purposes: it establishes the theoretical foundations required for subsequent technical chapters, and it identifies the specific failure modes that motivate the design decisions in our proposed system.
+The research trajectory was rigorously constrained into a multi-phase operational layout, ensuring that theoretical derivations gracefully translated into empirical deployment capability.
+
+| Phase | Duration | Objective & Key Output Deliverables | Status |
+|:---|:---|:---|:---:|
+| **1. Theoretical Initiation** | Weeks 1-2 | Extensive literature review surrounding UAD paradigms, Coreset theorems, and dimensionality reduction geometries. | Completed |
+| **2. Architectural Design** | Weeks 3-4 | Drafting the mathematical framework for the computationally bounded feature triad. Formulating YOLOv8 gating mechanisms. | Completed |
+| **3. Core Algorithm Implementation** | Weeks 5-7 | Developing the PatchCore core logic, executing LSH hashing integration, and training the ResNet-18 extraction network. | Completed |
+| **4. Integration & UI/UX** | Weeks 8-9 | Fusing mathematical outputs into the local Flask server architecture and weaving the HTML/JS semantic bridge. | Completed |
+| **5. Empirical Validation** | Weeks 10-11 | Orchestrating automated LLM hyperparameter generation over the 15 MVTec domains. Calibrating ROC optimal thresholds. | Completed |
+| **6. Documentation & Defense** | Weeks 12-14 | Compilation of empirical data, synthesis of the final academic thesis report, and system demonstrations setup. | Completed |
+
+<p align="center"><em>Table 10.2: Project schedule and milestone orchestration.</em></p>
+
+
 
 ---
 
-## 2.1 Reconstruction-Based Methods
+<div style="page-break-after: always;"></div>
 
+# III. Existing Systems/State of the Art
+
+## 1. Overview of the Field
 ### 2.1.1 Core Hypothesis: The Manifold Assumption
 
 Reconstruction-based anomaly detection rests on a precise mathematical assumption: nominal (defect-free) images occupy a low-dimensional manifold $\mathcal{M}$ embedded in the high-dimensional pixel space $\mathbb{R}^{C \times H \times W}$. A model trained to project inputs onto $\mathcal{M}$ and reconstruct them will produce high fidelity outputs for nominal inputs (which lie on $\mathcal{M}$) and degraded outputs for anomalous inputs (which lie off $\mathcal{M}$). The reconstruction error at each pixel then serves as a spatially-resolved anomaly score.
 
 The canonical implementation is the **Convolutional Autoencoder (CAE)** [12], which parameterizes this projection via an encoder-decoder architecture:
 
-$$\text{Encoder: } z = f_\theta(x), \quad z \in \mathbb{R}^{d_z}$$
-$$\text{Decoder: } \hat{x} = g_\phi(z), \quad \hat{x} \in \mathbb{R}^{C \times H \times W}$$
-
-where $d_z \ll C \cdot H \cdot W$ is the dimensionality of the latent bottleneck. The training objective minimizes pixel-wise reconstruction error:
-
-$$\mathcal{L}_{\text{MSE}} = \frac{1}{N} \sum_{i=1}^{N} \| x_i - g_\phi(f_\theta(x_i)) \|_2^2$$
+The model projects the input image into a lower-dimensional latent bottleneck and attempts to reconstruct it. Anomalies are detected by measuring the pixel-wise Mean Squared Error (MSE) between the input and the reconstruction.
 
 ### 2.1.2 The Bottleneck as an Information Filter
 
@@ -251,18 +268,13 @@ Despite these extensions, the fundamental limitation persists: reconstruction-ba
 
 ---
 
-## 2.2 Distribution-Based Methods
-
 ### 2.2.1 Core Hypothesis: The Support Boundary
 
 Distribution-based methods adopt a different mathematical formulation: rather than learning to reconstruct nominal images, they learn a **decision boundary** that encloses the nominal data distribution in a suitable feature space. Anomalies are defined as points falling outside this boundary.
 
 The foundational method is **One-Class SVM (OC-SVM)** (Schölkopf et al., 2001) [4], which solves the following optimization problem:
 
-$$\min_{w, \rho, \xi} \frac{1}{2} \|w\|^2 + \frac{1}{\nu n} \sum_{i=1}^{n} \xi_i - \rho$$
-$$\text{subject to: } w \cdot \Phi(x_i) \geq \rho - \xi_i, \quad \xi_i \geq 0$$
-
-where $\Phi(\cdot)$ is a kernel-induced feature mapping and $\nu$ controls the fraction of training points allowed to fall outside the boundary. The **RBF kernel** $K(x,y) = \exp(-\gamma \|x - y\|^2)$ implicitly maps data into an infinite-dimensional Hilbert space where linear separation becomes feasible even for complex data distributions.
+This approach constructs a hypersphere that tightly encompasses the normal data representations. Any feature vector falling outside this learned boundary is flagged as an anomaly. We utilize an RBF kernel to handle complex, non-linear data distributions.
 
 ### 2.2.2 The Feature Extraction Bottleneck
 
@@ -282,16 +294,7 @@ While this eliminates the kernel selection problem, it inherits the spatial blin
 
 ---
 
-## 2.3 Embedding-Based Methods: The Patch-Level Revolution
-
-### 2.3.1 Core Hypothesis: Normal Patterns Form a Discrete Reference Set
-
-Embedding-based methods reject both the reconstruction and distribution hypotheses in favor of a simpler but more powerful principle: **normality can be defined by a finite set of reference feature vectors, and anomaly is measured as distance from this reference set.**
-
-The critical innovation is operating at the **patch level** rather than the image level. By extracting dense feature vectors at every spatial position of a feature map and storing them in a memory bank, these methods preserve the spatial resolution needed for defect localization while leveraging the discriminative power of pre-trained deep features.
-
-### 2.3.2 Evolution: From SPADE to PatchCore
-
+## 2. Historical Context
 **SPADE** (Cohen & Hoshen, 2020) [5] introduced the concept of storing all patch-level features from the training set and performing k-NN lookup at inference time. For each spatial position in the test image's feature map, the nearest neighbor in the memory bank is found, and the distance serves as a pixel-level anomaly score. While effective, SPADE stores the complete feature set without compression, resulting in memory banks of several gigabytes for moderately-sized training sets.
 
 **PaDiM** (Defard et al., 2021) [6] replaced the explicit memory bank with a parametric model: for each spatial position, the training features are summarized by a multivariate Gaussian distribution (mean + covariance). Anomaly scores are computed via the Mahalanobis distance. This dramatically reduces memory requirements but assumes Gaussian-distributed features at each position — an assumption that may not hold for complex industrial textures.
@@ -304,8 +307,12 @@ The critical innovation is operating at the **patch level** rather than the imag
 
 3. **Locally-aware features**: The original PatchCore design applies spatial average pooling to the concatenated features, making each embedding a summary of its local neighborhood. Our implementation uses raw patch embeddings without pooling, prioritizing maximum spatial precision for defect localization in controlled industrial imaging environments.
 
-### 2.3.3 The Remaining Gap: Computational Efficiency
+## 3. Key Studies and Theories
+Embedding-based methods reject both the reconstruction and distribution hypotheses in favor of a simpler but more powerful principle: **normality can be defined by a finite set of reference feature vectors, and anomaly is measured as distance from this reference set.**
 
+The critical innovation is operating at the **patch level** rather than the image level. By extracting dense feature vectors at every spatial position of a feature map and storing them in a memory bank, these methods preserve the spatial resolution needed for defect localization while leveraging the discriminative power of pre-trained deep features.
+
+## 4. Technological Advancements
 PatchCore's [2] anomaly detection performance is near-optimal: image-level AUROC exceeds 99% on the MVTec AD benchmark [3] for most product categories. The open problem is **inference efficiency**.
 
 The anomaly scoring step requires computing the distance from every test patch embedding to its nearest neighbor in the coreset. Even after coreset reduction (typically to 10% of the original bank), the memory bank may contain 5,000–15,000 embeddings. For each test image, 1,024 query patches (from a 32×32 feature map) must each find their nearest neighbor among these embeddings. This exhaustive search has complexity:
@@ -324,8 +331,7 @@ None of these off-the-shelf solutions are specifically designed for the PatchCor
 
 ---
 
-## 2.4 Positioning of This Work
-
+## 5. Comparison of Existing Systems
 Table 2.1 summarizes the paradigm comparison and positions our contributions:
 
 | Criterion | Autoencoder | OC-SVM | PatchCore | **Ours** |
@@ -343,8 +349,10 @@ Our system does not propose a new anomaly detection paradigm. Instead, it addres
 
 ---
 
-## 2.5 License Compliance & Academic Integrity
+## 6. Gaps in the Literature/Technology
+*(Identified in the analysis of Reconstruction-Based and Distribution-Based methods above)*
 
+## 7. Justification for the Project
 This project adheres strictly to research ethics:
 *   **Dataset:** Utilizing the **MVTec AD** dataset [3] (Free for academic use).
 *   **Libraries:** Built on **PyTorch** [17] **(BSD)** and **Ultralytics** [18] **(AGPL)** frameworks.
@@ -352,10 +360,11 @@ This project adheres strictly to research ethics:
 
 ---
 
-# CHAPTER 3: FEATURE BACKBONE — Hierarchical Representation Learning via ResNet-18
+<div style="page-break-after: always;"></div>
 
+# IV. Methodology
 
-
+## 1. Research Questions and Objectives
 <div align="center">
   <img src="assets/architecture/diagram_kd.png" alt="CustomResNet-18 Architecture via Knowledge Distillation" style="max-width: 90%; width: auto;"/>
   <br>
@@ -368,96 +377,14 @@ This chapter provides a tensor-level dissection of the ResNet-18 backbone, traci
 
 ---
 
-## 3.1 Input Conditioning: Why Normalization Is Not Optional
+## 2. Data Collection and Preprocessing
+### 3.1 Input Conditioning
+All input images are resized to 256×256 pixels before entering the backbone. This provides additional spatial headroom for industrial micro-defect detection with negligible impact on the pre-trained feature quality. Each input tensor undergoes channel-wise normalization using ImageNet population statistics to perform a domain alignment, ensuring optimal feature activation.
 
-### 3.1.1 Spatial Normalization: The 256 × 256 Contract
+### Feature Hierarchy Extraction
+The ResNet-18 architecture extracts features through a series of convolutional layers and residual blocks. The initial stem (a 7x7 convolution followed by max pooling) provides aggressive spatial reduction while capturing basic structural elements like edges and gradients. The subsequent residual blocks (Layer 1 and Layer 2) refine these primitives into a mid-level feature vocabulary.
 
-All input images are resized to $256 \times 256$ pixels before entering the backbone. While the canonical ImageNet resolution is 224×224, our system uses 256×256 to provide additional spatial headroom for industrial micro-defect detection, with negligible impact on the pre-trained feature quality.
-
-**Mathematical justification.** The ResNet-18 architecture applies five stages of spatial downsampling (stride-2 operations), each halving the spatial dimensions:
-
-$$256 \xrightarrow{\text{Conv1}} 128 \xrightarrow{\text{MaxPool}} 64 \xrightarrow{\text{Layer2}} 32 \xrightarrow{\text{Layer3}} 16 \xrightarrow{\text{Layer4}} 8$$
-
-The terminal spatial dimension of $8 \times 8$ is compatible with ResNet's global average pooling layer, which collapses the feature map to a single vector. The factorization $256 = 2^8$ ensures exact integer division at every stride-2 stage — no fractional spatial dimensions, no padding artifacts, no information asymmetry between spatial positions.
-
-**Practical implication for anomaly detection.** Resizing industrial images (which may be captured at resolutions from 512×512 to 4096×4096) to 256×256 introduces a spatial compression that sets a lower bound on detectable defect size. A defect occupying $k \times k$ pixels in the original image maps to approximately $k \times (256/W_{\text{orig}})$ pixels in the resized input. For a 1024×1024 source image, defects smaller than approximately $4 \times 4$ pixels in the original may be compressed below single-pixel resolution in the resized input — an irrecoverable information loss that occurs before any neural network processing.
-
-### 3.1.2 Channel Normalization: ImageNet Statistics as a Prior
-
-Each input tensor undergoes channel-wise normalization, as shown in Table 3.1:
-
-$$x_c^{\text{norm}} = \frac{x_c - \mu_c}{\sigma_c}$$
-
-with the ImageNet population statistics:
-
-| Channel | Mean ($\mu$) | Std ($\sigma$) |
-|:---|:---|:---|
-| Red | 0.485 | 0.229 |
-| Green | 0.456 | 0.224 |
-| Blue | 0.406 | 0.225 |
-
-<p align="center"><em>Table 3.1: ImageNet normalization constants per channel used for input conditioning.</em></p>
-
-
-**Why these specific values matter.** These constants are not hyperparameters to be tuned — they are the empirical first and second moments of the pixel distribution across 1.28 million ImageNet [24] training images. Applying this normalization to industrial images performs a **domain alignment**: it transforms the input distribution to match the distribution on which the backbone's batch normalization layers and convolutional filters were calibrated.
-
-**The zero-centering effect.** Subtracting the mean shifts the data distribution to be approximately zero-centered. This is critical for the ReLU activation functions throughout the network: a zero-centered distribution ensures that approximately half of the input values are positive (and thus pass through ReLU unchanged) and half are negative (and thus zeroed out). Without normalization, a distribution skewed toward positive values would cause most neurons to fire indiscriminately, reducing the network's discriminative capacity.
-
-**Failure scenario.** If industrial images have a dramatically different color distribution from ImageNet (e.g., infrared thermal images, X-ray scans), the normalization constants produce a distribution mismatch. The backbone's early convolutional filters, optimized for natural RGB statistics, will generate suboptimal feature activations. This is a known limitation of transfer learning from ImageNet to non-photographic domains.
-
----
-
-## 3.2 The Stem: Aggressive Spatial Reduction
-
-The ResNet-18 stem consists of three operations that transform the input tensor from $(B, 3, 256, 256)$ to $(B, 64, 64, 64)$ — a 16× spatial reduction before any residual block is encountered.
-
-### 3.2.1 Conv1: The 7×7 Convolution
-
-$$T_{\text{in}} \in \mathbb{R}^{B \times 3 \times 256 \times 256} \xrightarrow{\text{Conv}(3 \to 64, k{=}7, s{=}2, p{=}3)} T_{\text{conv1}} \in \mathbb{R}^{B \times 64 \times 128 \times 128}$$
-
-**Why 7×7 and not 3×3?** The first convolutional layer operates directly on raw (normalized) pixels. At this stage, individual pixels carry no semantic meaning — a single red pixel could be part of a defect, a product surface, or a background artifact. The 7×7 kernel provides a **49-pixel receptive field** at the first layer, sufficient to capture basic structural elements: edges, corners, gradient orientations, and local texture periodicity.
-
-This is a deliberate design trade-off. Modern architectures (e.g., ConvNeXt [22]) have shown that replacing the 7×7 stem with stacked 3×3 convolutions can improve classification accuracy. However, for anomaly detection, the larger initial receptive field provides an immediate advantage: it suppresses single-pixel noise that could otherwise propagate through the network and generate false anomaly signals.
-
-**Parameter count.** This single layer contains $3 \times 64 \times 7 \times 7 + 64 = 9{,}472$ parameters — a negligible fraction of the total network, yet it determines the fundamental texture vocabulary available to all subsequent layers.
-
-**Stride-2 mechanics.** The stride of 2 means the convolution kernel advances by 2 pixels between applications, halving the spatial dimensions. Each output pixel integrates information from a 7×7 input region, but adjacent output pixels share a 5×7 overlap region. This overlapping ensures that no input information falls into a "blind spot" between receptive fields.
-
-After Conv1, the feature map passes through Batch Normalization and ReLU activation. The BatchNorm layer normalizes each of the 64 channels independently to zero mean and unit variance using running statistics computed during ImageNet [24] pre-training, stabilizing the activation distribution regardless of the input image's absolute brightness or contrast — a property critical for industrial environments where lighting conditions vary between inspection stations. The ReLU activation $f(x) = \max(0, x)$ introduces the non-linearity necessary for learning complex visual patterns. In the context of anomaly detection, ReLU's thresholding behavior creates a sparse activation pattern where approximately 50% of neurons are inactive for any given input, meaning each image activates a distinct subset of feature channels, making the downstream embedding more discriminative.
-
-The final stage of the stem is MaxPool:
-
-$$T_{\text{conv1}} \in \mathbb{R}^{B \times 64 \times 128 \times 128} \xrightarrow{\text{MaxPool}(k{=}3, s{=}2, p{=}1)} T_{\text{pool}} \in \mathbb{R}^{B \times 64 \times 64 \times 64}$$
-
-MaxPool selects the maximum activation within each 3×3 neighborhood, providing **local translation invariance**: if a defect pattern shifts by 1–2 pixels between images (due to camera vibration or part placement variability), the max-pooled activation remains approximately constant. This is distinct from average pooling, which would dilute strong defect signals by averaging them with surrounding normal activations. After the complete stem, the spatial dimensions have been reduced from 256 to 64 — a 4× reduction — and the effective receptive field at this point is $11 \times 11$ pixels in the original input space.
-
----
-
-## 3.3 Residual Blocks: The Skip Connection Principle
-
-The fundamental insight of ResNet [1] (He et al., 2016) is that deeper networks should not perform worse than shallower networks — but in practice, they do, due to optimization difficulties. The residual formulation addresses this by reformulating each block's learning objective:
-
-$$y = \mathcal{F}(x, \{W_i\}) + x$$
-
-Instead of learning the desired mapping $H(x) = y$ directly, the block learns the **residual** $\mathcal{F}(x) = H(x) - x$. If the optimal transformation is close to identity (i.e., the block should pass information through unchanged), the network only needs to learn $\mathcal{F}(x) \approx 0$ — pushing weights toward zero, which is a far easier optimization target than learning an arbitrary identity mapping.
-
-In classification tasks, skip connections primarily serve as an optimization aid. In anomaly detection, however, they play a more fundamental role: **they preserve high-frequency spatial details that would otherwise be attenuated by deep convolutional processing.** Surface defects in industrial products are inherently high-frequency signals — they represent sharp, localized deviations from smooth, regular textures. Without skip connections, each convolutional layer applies a smoothing operation (convolution kernels act as low-pass filters on the spatial frequency spectrum), and after multiple layers, fine-grained defect signatures are progressively smoothed away. The skip connection provides an additive bypass that ensures the original spatial information is always available, even after deep processing. This explains an empirical observation in the anomaly detection literature: ResNet-based backbones [1] consistently outperform VGG-based backbones [27] (which lack skip connections) for anomaly detection tasks, despite VGG's comparable classification performance. The difference is not about representational capacity but about **information preservation**.
-
-### 3.3.3 Layer 1: Low-Level Feature Dictionary
-
-$$T_{\text{pool}} \in \mathbb{R}^{B \times 64 \times 64 \times 64} \xrightarrow{\text{Layer1}} T_{\text{L1}} \in \mathbb{R}^{B \times 64 \times 64 \times 64}$$
-
-Layer 1 consists of two BasicBlocks, each containing two 3×3 convolutions with skip connections. The spatial dimensions and channel count remain unchanged (64 channels, 64×64 spatial). This layer refines the stem's raw edge and texture responses into a more structured feature vocabulary: oriented edges become grouped into contours, texture gradients become texture descriptors, and noise responses are suppressed by the learned filters.
-
-The 64 channels can be interpreted as a **dictionary of 64 visual primitives**. Each channel responds selectively to a specific visual pattern: horizontal edges, vertical edges, diagonal gradients, blob-like structures, texture frequencies, etc. At this stage, these primitives are not yet semantically meaningful — they describe local statistics of the pixel neighborhood, not the identity or structure of the object being imaged.
-
-### 3.3.4 Layer 2: Mid-Level Structural Features
-
-$$T_{\text{L1}} \in \mathbb{R}^{B \times 64 \times 64 \times 64} \xrightarrow{\text{Layer2}} T_{\text{L2}} \in \mathbb{R}^{B \times 128 \times 32 \times 32}$$
-
-Layer 2 introduces a **dimension transition**: the channel count doubles from 64 to 128, while the spatial resolution halves from 64 to 32 (via a stride-2 convolution in the first BasicBlock). This is a critical inflection point. The channel expansion from 64 to 128 gives the network sufficient capacity to represent compositions of Layer 1 primitives — where Layer 1 detects individual edges, Layer 2 detects edge combinations: corners, T-junctions, parallel lines, and texture boundaries. These mid-level features are the primary carriers of defect-relevant information, as a scratch manifests as an unexpected linear edge composition and a dent as an unexpected curvature pattern. Simultaneously, the spatial reduction from 64×64 to 32×32 means each position in the feature map has an effective receptive field of approximately $43 \times 43$ pixels in the original 256×256 input — large enough to encompass most industrial micro-defects while remaining small enough to precisely localize them. This layer serves as the first extraction point for PatchCore's memory bank, providing the mid-level texture features that are most directly sensitive to surface anomalies.
-
----
+We specifically avoid using the deepest layers (like Layer 4) because they encode highly abstract, object-level semantics optimized for ImageNet classification, which are less useful for localized industrial anomaly detection. Instead, we focus on mid-level features that capture the necessary texture and structural context.
 
 ## 3.4 Layer Selection for PatchCore: A Principled Trade-Off
 
@@ -512,10 +439,7 @@ On a modern GPU, ~1,060M MACs translate to approximately **1.5ms inference time*
 
 ---
 
-# CHAPTER 4: THE PATCHCORE MEMORY ENGINE — Coreset Construction and Anomaly Scoring
-
-
-
+## 4. Model Training and Validation
 <div align="center">
   <img src="assets/architecture/diagram_patchcore.png" alt="Enhanced PatchCore Engine Architecture" style="max-width: 90%; width: auto;"/>
   <br>
@@ -528,43 +452,9 @@ Having established the backbone's feature extraction mechanics (Chapter 3), we n
 
 ## 4.1 Hierarchical Feature Fusion
 
-### 4.1.1 The Multi-Scale Representation Problem
+To resolve the representational deficit of using a single layer, we employ **feature concatenation across scales**. Layer 3 features are upsampled via bilinear interpolation to match Layer 2's spatial resolution, producing a 384-dimensional multi-scale embedding that simultaneously encodes texture and structural context. We extract raw patch embeddings without spatial pooling to prioritize maximum spatial precision for defect localization.
 
-Chapter 3.4 established that Layer 2 features encode local texture patterns while Layer 3 features encode structural context. Using either layer in isolation creates a representational deficit:
 
-- **Layer 2 only (128-d, 32×32)**: A texture patch from the cap region and the body region of a bottle may produce similar feature vectors despite belonging to entirely different structural contexts. The memory bank cannot distinguish position-dependent normality.
-
-- **Layer 3 only (256-d, 16×16)**: The coarser spatial resolution (16×16 vs. 32×32) reduces localization precision by a factor of 4 in area. A defect occupying a 2×2 region in the 32×32 map is compressed into a single position in the 16×16 map, potentially diluting the anomaly signal below detection threshold.
-
-The solution is **feature concatenation across scales**, which requires resolving the spatial dimension mismatch.
-
-Layer 3 features at resolution $16 \times 16$ must be upsampled to match Layer 2's $32 \times 32$ resolution. We employ bilinear interpolation, which computes each upsampled value as a weighted average of the four nearest spatial neighbors:
-
-$$f(x, y) = \sum_{i \in \{0,1\}} \sum_{j \in \{0,1\}} w_{ij} \cdot f(\lfloor x \rfloor + i, \lfloor y \rfloor + j)$$
-
-where the weights $w_{ij}$ are proportional to the inverse distance from $(x, y)$ to each neighbor. This operation is differentiable and introduces no learnable parameters. Bilinear interpolation is preferred over nearest-neighbor upsampling, which creates discontinuous feature values across spatial boundaries that could generate false anomaly signals, and over transposed convolution, which would introduce learnable parameters inconsistent with our frozen backbone approach.
-
-After spatial alignment, the two feature maps are concatenated along the channel dimension:
-
-$$T_{\text{fused}} = \text{Concat}(T_{\text{L2}}, \text{Upsample}(T_{\text{L3}})) \in \mathbb{R}^{B \times 384 \times 28 \times 28}$$
-
-Each spatial position $(i, j)$ in $T_{\text{fused}}$ now carries a 384-dimensional vector: dimensions 1–128 encode Layer 2 features (texture, local patterns) and dimensions 129–384 encode Layer 3 features (structure, context). The dimensionality of 384 is not arbitrary — it is the minimal representation that captures both texture and context without redundancy. Empirically, adding Layer 4 features (which would increase dimensionality to 896) provides negligible improvement in anomaly detection performance while nearly tripling the memory bank storage and search cost.
-
----
-
-## 4.2 Locally-Aware Patch Embeddings
-
-If we directly extract the 384-d vector at each spatial position, the resulting embedding is a **point measurement** — it reflects the feature response at exactly one location. This creates fragility: a 1-pixel shift in the input image (due to camera jitter or part placement variability) shifts all feature map positions, potentially changing the nearest-neighbor assignments in the memory bank and producing inconsistent anomaly scores between identical parts.
-
-The original PatchCore paper [2] (Roth et al., 2022) addresses this through **local average pooling** over a small spatial neighborhood (typically 3×3) before extracting patch embeddings:
-
-$$p_{ij} = \frac{1}{|\mathcal{N}(i,j)|} \sum_{(i', j') \in \mathcal{N}(i,j)} T_{\text{fused}}[:, :, i', j']$$
-
-where $\mathcal{N}(i,j)$ is the set of spatial positions within the pooling window centered at $(i,j)$. This pooling operation acts as a low-pass spatial filter on the feature map, smoothing out high-frequency spatial variations while preserving the dominant texture and structural patterns. The result is that embeddings for spatially adjacent nominal patches become more similar (tighter clusters in embedding space), while genuinely anomalous regions — which produce spatially coherent high-distance patterns — remain distinguishable. Our implementation, however, omits this pooling step in favor of raw patch embeddings. This design decision prioritizes maximum spatial precision for defect localization — the 32×32 feature map directly encodes per-position anomaly scores without any smoothing-induced blurring. The trade-off is slightly reduced translation invariance, which is acceptable in our controlled industrial imaging setup where camera position is fixed.
-
----
-
-## 4.3 Memory Bank Construction
 
 During the training phase (which, for PatchCore, involves no gradient computation — only a forward pass), we extract locally-aware patch embeddings from all nominal training images and concatenate them into a single memory bank:
 
@@ -578,52 +468,9 @@ This scale motivates aggressive compression. Industrial training images are, by 
 
 ## 4.4 Coreset Subsampling: The Minimax Facility Location Formulation
 
-The coreset selection objective can be formalized as the **Minimax Facility Location** problem:
+To reduce the massive memory footprint of storing all patch embeddings, we employ a **Greedy Coreset Subsampling** strategy. This technique iteratively selects a representative subset of embeddings that maximizes the topological coverage of the feature space while eliminating redundant normal patterns.
 
-$$M_C^* = \arg\min_{M_C \subset M, \; |M_C| = N_c} \max_{m \in M} \min_{c \in M_C} \|m - c\|_2$$
-
-In words: find a subset $M_C$ of size $N_c$ such that the **maximum distance** from any point in the original set $M$ to its closest point in $M_C$ is minimized. This is equivalent to minimizing the **coverage radius** — the radius of the smallest ball around each coreset point that collectively covers the entire original set. The minimax formulation is preferred over minimizing average distance because the latter would allow the algorithm to neglect isolated outlier patches (which are rare but potentially represent critical texture variations near defect boundaries) in favor of densely populated regions, whereas the minimax objective ensures that **no point in the original set is neglected**.
-
-The Minimax Facility Location problem is NP-hard in general. PatchCore [2] employs a greedy approximation that provides a 2-approximation guarantee: the solution's coverage radius is at most twice the optimal value.
-
-**Algorithm: Greedy Coreset Selection**
-
-```
-Input: Memory bank M = {m_1, ..., m_N}, target size N_c
-Output: Coreset M_C ⊂ M, |M_C| = N_c
-
-1. Select m_0 ∈ M uniformly at random → M_C = {m_0}
-2. Compute d[i] = ||m_i - m_0||² for all i ∈ [1, N]
-3. For t = 1 to N_c-1:
-   a. j* = argmax_i d[i]          // Find the most "neglected" point
-   b. M_C = M_C ∪ {m_j*}          // Add it to the coreset
-   c. For all i: d[i] = min(d[i], ||m_i - m_j*||²)  // Update distances
-4. Return M_C
-```
-
-### 4.4.3 Complexity Analysis
-
-**Time complexity.** Each iteration of the greedy loop (Step 3) requires computing the distance from all $N$ points to the newly selected coreset point ($O(N \cdot D)$) and updating the minimum distances ($O(N)$). Over $N_c$ iterations:
-
-$$\mathcal{C}_{\text{coreset}} = O(N_c \cdot N \cdot D)$$
-
-For $N = 78{,}400$, $D = 384$, and $N_c = 7{,}840$ (10% coreset ratio):
-
-$$\mathcal{C}_{\text{coreset}} = 7{,}840 \times 78{,}400 \times 384 \approx 2.36 \times 10^{11} \text{ operations}$$
-
-This is a one-time offline cost during model fitting (approximately 30–60 seconds on GPU), not an inference-time cost.
-
-### 4.4.4 The Random Projection Acceleration
-
-To reduce the per-iteration distance computation cost (the dominant factor), the implementation applies **Random Projection** before the greedy selection. A random matrix $R \in \mathbb{R}^{d' \times D}$ (with $d' = 128$) projects all embeddings to a lower-dimensional space:
-
-$$m_i' = R \cdot m_i, \quad m_i' \in \mathbb{R}^{128}$$
-
-The **Johnson-Lindenstrauss lemma** guarantees that with high probability, pairwise distances are preserved up to a multiplicative factor of $(1 \pm \epsilon)$ for appropriate choice of $d'$. Specifically, for $\epsilon = 0.1$ and $N = 78{,}400$:
-
-$$d' \geq \frac{8 \ln N}{\epsilon^2} = \frac{8 \times 11.27}{0.01} \approx 9{,}016$$
-
-The theoretical bound suggests $d' = 9{,}016$ for $\epsilon = 0.1$ — far larger than our choice of $d' = 128$. This means we accept a larger distortion ($\epsilon \approx 0.8$) in exchange for a 3× speedup in the greedy selection. The practical impact is limited because the greedy algorithm's 2-approximation guarantee already tolerates suboptimality; the additional distance distortion from aggressive projection is absorbed within this tolerance band.
+By solving an approximation to the Minimax Facility Location problem, the coreset ensures that no critical nominal variation is neglected, even when reducing the memory bank size by 90%. To further accelerate the fitting process, random projection is applied to reduce the dimensionality of the embeddings during the greedy selection phase.
 
 ### 4.4.5 Coreset Ratio: The Accuracy-Efficiency Trade-Off
 
@@ -645,215 +492,170 @@ The coreset ratio $r = N_c / N$ is the single most important hyperparameter cont
 
 ## 4.5 Anomaly Scoring: The Max-Distance Criterion
 
-### 4.5.1 Patch-Level Scoring
+### 4.5 Anomaly Scoring
+At inference time, each test image produces query patch embeddings. For each patch, we compute its distance to the nearest coreset member. The image-level anomaly score aggregates these patch scores via the **maximum** operator, ensuring that a single highly anomalous patch is sufficient to flag the entire image.
 
-At inference time, each test image produces 1,024 query patch embeddings ($32 \times 32$). For each query patch $q_{ij}$, we compute its distance to the nearest coreset member:
+## 5. Evaluation Metrics
+*(Detailed in Experiments & Evaluation chapter)*
 
-$$s_{ij} = \min_{c \in M_C} \|q_{ij} - c\|_2$$
-
-This produces a **patch-level anomaly score map** $S \in \mathbb{R}^{32 \times 32}$, which can be upsampled to the original image resolution for visualization as a heatmap.
-
-### 4.5.2 Image-Level Scoring: Why Maximum, Not Average?
-
-The image-level anomaly score aggregates the patch scores via the **maximum** operator:
-
-$$s_{\text{image}} = \max_{(i,j)} s_{ij} = \max_{(i,j)} \min_{c \in M_C} \|q_{ij} - c\|_2$$
-
-**Why not average?** Consider an image with a small scratch occupying 4 out of 1,024 patches. The average score would be:
-
-$$s_{\text{avg}} = \frac{4 \times s_{\text{defect}} + 1{,}020 \times s_{\text{normal}}}{1{,}024}$$
-
-Even if $s_{\text{defect}}$ is 10× larger than $s_{\text{normal}}$, the average is dominated by the 1,020 normal patches, producing a score barely above the normal baseline. The max operator ensures that a single highly anomalous patch is sufficient to flag the entire image — this is the correct behavior for industrial QA, where a product with even one defect must be rejected.
-
-**Connection to extreme value theory.** The max-score aggregation makes the anomaly detection system a **heavy-tail detector**: it is sensitive to the tails of the distance distribution rather than its center. This aligns with the statistical nature of defects — they are rare, localized events that produce outlier distances, not systematic shifts in the average distance.
-
-### 4.5.3 Failure Modes of the Max-Score Approach
-
-**False positive from novel nominal patterns.** If the test image contains a nominal surface region not well-represented in the coreset (e.g., a rare but valid texture variant that was undersampled during training), the max-distance for that region may exceed the anomaly threshold. This is a direct consequence of the minimax formulation: the coverage guarantee applies to the training set, not to unseen nominal variations.
-
-**Anomaly masking at low coreset ratios.** If the coreset is too aggressively reduced, the nearest-neighbor distances for all patches (both normal and anomalous) increase uniformly. This raises the noise floor of the score distribution, potentially pushing normal patch scores above the threshold (false positives) or reducing the relative gap between normal and anomalous scores (reduced discriminative power).
+## 6. Implementation Plan
+The system described in Chapters 3–6 is a **static pipeline**: once the coreset is selected, the LSH index is built, and the threshold is calibrated, the system's behavior is frozen. It cannot adapt to distributional shifts in production data, refine its own hyperparameters based on observed performance, or communicate the rationale behind its decisions to human operators. This chapter addresses these limitations through two complementary extensions: an **autonomous hyperparameter optimization agent** powered by a Large Language Model (LLM), and an **Explainable AI (XAI) layer** that transforms numerical anomaly outputs into natural-language diagnostic reports.
 
 ---
 
-# CHAPTER 5: OPTIMIZATION INTERNALS — Approximate Search and Hardware-Aware Distance Computation
+## 7.1 The Hyperparameter Sensitivity Problem
+
+### 7.1.1 Category-Specific Optimal Configurations
+
+The PatchCore pipeline exposes several hyperparameters whose optimal values vary significantly across product categories, as shown in Table 7.1:
+
+| Hyperparameter | Effect | Optimal Range Varies Because |
+|:---|:---|:---|
+| `coreset_ratio` | Memory bank compression | Texture complexity differs per category |
+| `k_neighbors` | Score smoothing | Noise level differs per category |
+| `lsh_bits` | Search granularity | Embedding distribution shape differs |
+
+<p align="center"><em>Table 7.1: Category-specific hyperparameter sensitivity analysis.</em></p>
 
 
+For 15 MVTec AD categories, exhaustive grid search over even a modest 3-parameter space with 5 values each would require $5^3 = 125$ training runs per category, totaling $15 \times 125 = 1{,}875$ experiments. At approximately 2 minutes per training run, this represents over 60 hours of computation — impractical for iterative development.
 
-This chapter presents the primary engineering contribution of this thesis: the replacement of PatchCore's exhaustive nearest-neighbor search with a **two-tier acceleration strategy** that achieves significant latency reduction (quantified in Table 5.1 and §8.6) while maintaining high detection accuracy. The first tier — Locality-Sensitive Hashing (LSH) with XOR-Probe [8, 23] — reduces the number of candidate vectors to evaluate. The second tier — algebraic distance decomposition — accelerates each individual distance computation by exploiting GPU matrix multiplication hardware.
+### 7.1.2 The Limitations of Conventional AutoML
 
-These optimizations are not independently novel; LSH and matrix distance tricks are well-established in the ANN literature [8, 23]. The contribution lies in their **co-designed integration** within the PatchCore inference pipeline, where the specific constraints (moderate bank size, high dimensionality, extreme accuracy requirements) create a unique optimization regime not well-served by general-purpose ANN libraries.
+Standard hyperparameter optimization methods address this problem through different strategies:
+
+- **Grid Search**: Exhaustive but combinatorially explosive.
+- **Random Search** [10] (Bergstra & Bengio, 2012): More efficient than grid search for high-dimensional spaces, but provides no mechanism for reasoning about *why* certain configurations perform better.
+- **Bayesian Optimization** [29] (e.g., Gaussian Process-based): Efficient sample-wise, but treats the objective function as a black box. It cannot leverage domain knowledge to warm-start the search.
+- **Population-based Training**: Requires parallel infrastructure and is designed for neural network training, not for the discrete hyperparameter space of a memory-bank-based system.
+
+None of these methods can **reason about the relationship** between performance metrics and hyperparameter choices in a way that transfers across categories.
 
 ---
 
-## 5.1 The Search Bottleneck: A Quantitative Analysis
+## 7.2 The Agentic Optimization Architecture
 
-Before introducing the optimization, we must precisely characterize the problem it solves. Chapter 4.5 established that the anomaly scoring step requires:
+### 7.2.1 LLM as a Research Agent
 
-$$\forall q \in Q: \quad s_q = \min_{c \in M_C} \|q - c\|_2$$
+We introduce a fundamentally different approach: using a Large Language Model (Gemini) as an **autonomous research agent** that reads experimental results, reasons about performance patterns, and proposes hyperparameter adjustments.
 
-where $Q$ is the set of 1,024 query patches and $M_C$ is the coreset of size $|M_C| \approx 10{,}240$. The naive implementation evaluates this as a nested loop:
+The agent operates in a closed feedback loop:
 
 ```
-For each query patch q ∈ Q:              // 1,024 iterations
-    For each coreset member c ∈ M_C:      // 10,240 iterations
-        Compute ||q - c||²                // 384 multiplications + 384 additions
-    s_q = min over all distances
+┌─────────────────────────────────────────────────────┐
+│                    AGENTIC LOOP                     │
+│                                                     │
+│  1. RUNNER                                          │
+│     Execute evaluation across 15 categories         │
+│     Output: results/*.json (AUROC, F1, latency)     │
+│                        ↓                            │
+│  2. READER (Gemini Agent)                           │
+│     Parse JSON results into structured context      │
+│     Identify underperforming categories              │
+│                        ↓                            │
+│  3. REASONER (Gemini Agent)                         │
+│     Analyze: "Screw AUROC=0.75, latency=20ms"       │
+│     Hypothesis: "Low AUROC + fast latency →          │
+│       coreset too aggressive, increase ratio"        │
+│                        ↓                            │
+│  4. PROPOSER (Gemini Agent)                         │
+│     Output: New configuration JSON                   │
+│     {coreset_ratio: 0.2, k_neighbors: 3}            │
+│                        ↓                            │
+│  5. EXECUTOR                                        │
+│     Apply new config → Retrain → Re-evaluate        │
+│     Output: Updated results/*.json                   │
+│                        └──────→ Back to Step 2      │
+└─────────────────────────────────────────────────────┘
 ```
 
-**Total operations:** $1{,}024 \times 10{,}240 \times 768 = 8.05 \times 10^9$ FLOPs
+The critical distinction between this approach and conventional AutoML is the **reasoning step** (Step 3). The LLM does not treat the hyperparameter-performance relationship as a black box. Instead, it leverages its pre-trained knowledge of machine learning to form mechanistic hypotheses. For example, when analyzing a category like "Screw" that achieves AUROC 0.75 with `coreset_ratio=0.1`, `k_neighbors=1`, and `inference_time=18ms`, the agent reasons: *"The low AUROC indicates insufficient coverage of the nominal feature distribution. The fast inference time suggests computational headroom is available. The 'Screw' category is known to have high intra-class variability. Therefore, increasing coreset_ratio to 0.2 and k_neighbors to 3 should improve AUROC by 5–10% with approximately 2× inference time increase, which remains within acceptable limits."* This reasoning chain is transferable: once the agent learns that high-texture-variability categories benefit from higher coreset ratios, it can apply this insight proactively to new categories without requiring experimentation.
 
-On a mid-range GPU (e.g., GTX 1660 with ~5 TFLOPS FP32), this translates to approximately **1.6ms** — seemingly fast. However, this analysis ignores memory bandwidth. The 10,240 coreset vectors (each 384 × 4 bytes = 1,536 bytes) total 15.7 MB. For each of the 1,024 query patches, the entire coreset must be loaded from GPU global memory into registers. With a memory bandwidth of ~192 GB/s:
+The quality of the agent's reasoning depends critically on the **prompt structure**. We employ a structured prompt template that specifies the system role, context (model type, current results, hardware constraints), task (identify underperforming categories and propose changes), and output format (JSON). The structured JSON output format ensures that proposals are machine-parseable and can be automatically applied by the Executor without human intervention:
 
-$$t_{\text{memory}} = \frac{1{,}024 \times 15.7 \text{ MB}}{192 \text{ GB/s}} = 83.7 \text{ ms}$$
+```
+SYSTEM: You are an expert ML researcher optimizing an anomaly 
+detection system. You analyze experimental results and propose 
+hyperparameter adjustments.
 
-The search is **memory-bound, not compute-bound**. This is the regime where reducing the number of candidate vectors (via LSH) yields substantial real-world speedup, even though the theoretical FLOP reduction seems modest.
+CONTEXT:
+- Model: PatchCore with LSH acceleration
+- Current results: [JSON data from results/]
+- Hardware: 6GB VRAM, sequential processing
+- Constraint: Inference time must remain < 1 second per image
 
----
+TASK: Identify categories with AUROC < 0.90 and propose specific
+hyperparameter changes. For each proposal, explain:
+1. What to change and by how much
+2. Why this change should improve performance  
+3. What side effects to expect (speed, memory)
+4. What to monitor in the next iteration
 
-## 5.2 Locality-Sensitive Hashing: From Continuous to Discrete
-
-Locality-Sensitive Hashing maps high-dimensional continuous vectors to low-dimensional discrete hash codes such that nearby vectors in the original space are likely to receive the same hash code. Formally, a hash family $\mathcal{H}$ is $(r_1, r_2, p_1, p_2)$-sensitive if for any two points $u, v$:
-
-$$\|u - v\| \leq r_1 \implies \Pr[h(u) = h(v)] \geq p_1$$
-$$\|u - v\| \geq r_2 \implies \Pr[h(u) = h(v)] \leq p_2$$
-
-where $r_1 < r_2$ and $p_1 > p_2$. The gap between $p_1$ and $p_2$ determines the hash family's discriminative power.
-
-Our implementation uses the **random hyperplane** hash family [8] (Charikar, 2002), which is a SimHash variant adapted for Euclidean distance. We generate $b = 12$ random vectors $\{w_1, \ldots, w_{12}\}$ sampled from $\mathcal{N}(0, I_{384})$. Each hash bit is computed as:
-
-$$h_i(v) = \begin{cases} 1 & \text{if } w_i \cdot v > 0 \\ 0 & \text{if } w_i \cdot v \leq 0 \end{cases}$$
-
-The complete hash code is a 12-bit integer:
-
-$$H(v) = \sum_{i=0}^{11} 2^i \cdot h_i(v), \quad H(v) \in \{0, 1, \ldots, 4095\}$$
-
-Geometrically, each random vector $w_i$ defines a hyperplane passing through the origin in $\mathbb{R}^{384}$. The sign of $w_i \cdot v$ indicates which half-space the vector $v$ lies in. The 12 hyperplanes partition the 384-dimensional space into $2^{12} = 4{,}096$ regions (buckets). Two vectors receive the same hash code if and only if they lie in the same region — i.e., they are on the same side of all 12 hyperplanes.
-
-For a coreset of $|M_C| = 10{,}240$ vectors distributed across 4,096 buckets, the expected number of vectors per bucket under uniform distribution is $\mathbb{E}[\text{bucket size}] = 10{,}240 / 4{,}096 \approx 2.50$. In practice, the distribution is non-uniform: regions of the feature space corresponding to common surface textures contain more vectors, while regions corresponding to rare textures contain fewer. However, the greedy coreset selection (Chapter 4.4) explicitly seeks topological diversity, which acts as a regularizing force toward more uniform bucket distribution. When searching for the nearest neighbor of a query $q$, we first compute $H(q)$ (12 dot products — negligible cost) and then search only within the bucket $B_{H(q)}$:
-
-$$s_q^{\text{LSH}} = \min_{c \in B_{H(q)}} \|q - c\|_2$$
-
-This reduces the expected search candidates per query to approximately 2–3 vectors instead of 10,240 — a speedup factor of $10{,}240 / 2.50 \approx 4{,}096\times$ in the number of distance computations.
-
----
-
-## 5.3 The Boundary Problem and XOR-Probe
-
-LSH's theoretical guarantee is probabilistic: nearby vectors are *likely* to share a hash code, but not guaranteed. The failure case occurs when two nearby vectors lie on opposite sides of one or more hyperplanes — they receive different hash codes despite being close in Euclidean distance. For the random hyperplane family, the probability that two vectors $u, v$ with angle $\theta$ between them receive the same hash for a single hyperplane is $\Pr[h_i(u) = h_i(v)] = 1 - \theta/\pi$. For $b = 12$ independent hyperplanes:
-
-$$\Pr[H(u) = H(v)] = \left(1 - \frac{\theta}{\pi}\right)^{12}$$
-
-For vectors that are close but not identical (e.g., $\theta = 0.1$ radians ≈ 5.7°), this yields $\Pr[H(u) = H(v)] = (0.968)^{12} \approx 0.679$, meaning there is a **32.1% probability** of hash collision (different hash codes). In anomaly detection, this translates to a 32% chance that the true nearest neighbor of a query patch is not in the same bucket.
-
-To recover these missed nearest neighbors, we extend the search from the exact hash bucket to all **Hamming-adjacent buckets** — buckets whose hash codes differ from the query's hash code by exactly one bit. For a $b$-bit hash code $H(q)$, the set of Hamming-1 neighbors is:
-
-$$\mathcal{N}_1(H(q)) = \{H(q) \oplus 2^i \mid i \in \{0, 1, \ldots, b-1\}\}$$
-
-where $\oplus$ denotes bitwise XOR. This produces exactly $b = 12$ additional buckets. The complete search set becomes:
-
-$$\mathcal{S}(q) = B_{H(q)} \cup \bigcup_{i=0}^{11} B_{H(q) \oplus 2^i}$$
-
-The total buckets searched is $1 + 12 = 13$ (out of 4,096), yielding approximately $13 \times 1.91 \approx 24.8$ search candidates per query and an updated speedup factor of $7{,}840 / 24.8 \approx 316\times$. The search step is fully vectorized on the GPU using **XOR Broadcasting** to generate all 1-bit Hamming-distance probes simultaneously, achieving effective $O(1)$ lookup per probe generation.
-
-The probability that two nearby vectors (angle $\theta$) share a hash code OR differ by exactly one bit is:
-
-$$\Pr[\text{found}] = \Pr[\Delta = 0] + \Pr[\Delta = 1]$$
-
-where $\Delta$ is the Hamming distance between their hash codes. Let $p = 1 - \theta/\pi$:
-
-$$\Pr[\Delta = 0] = p^{12}, \quad \Pr[\Delta = 1] = 12 \cdot p^{11}(1-p)$$
-
-For $\theta = 0.1$: $\Pr[\text{found}] = (0.968)^{12} + 12 \times (0.968)^{11} \times 0.032 = 0.679 + 0.269 = 0.948$. The XOR-Probe raises the recall from 67.9% to **94.8%** for vectors at $\theta = 0.1$ — a substantial improvement. For even closer vectors ($\theta = 0.05$, approximately 2.9°), the recall exceeds 99%. The residual 5.2% miss rate corresponds to vectors that differ by 2+ bits, which are rare for the tightly clustered nominal distributions typical of industrial products.
-
----
-
-## 5.4 Hardware-Aware Distance Computation: The Matrix Decomposition Trick
-
-Even after LSH reduces the candidate set to ~33 vectors per query, the individual distance computations remain a bottleneck when accumulated over 1,024 query patches. The naive Euclidean distance $d(q, c) = \sqrt{\sum_{i=1}^{384} (q_i - c_i)^2}$ requires element-wise subtraction, squaring, and summation — operations that do not map efficiently to GPU Tensor Cores, which are optimized for fused multiply-accumulate (FMA) in matrix multiplication patterns.
-
-We address this through the standard binomial expansion:
-
-$$\|q - c\|^2 = \|q\|^2 + \|c\|^2 - 2 \langle q, c \rangle$$
-
-This decomposes the distance into three components:
-
-| Component | Computation | When Computed | Cost |
-|:---|:---|:---|:---|
-| $\|q\|^2$ | Sum of squared elements of query vector | Once per query | $O(D)$ per query |
-| $\|c\|^2$ | Sum of squared elements of coreset vector | Once during fitting (precomputed) | Amortized $O(1)$ |
-| $\langle q, c \rangle$ | **Matrix multiplication** $Q \cdot C^T$ | At search time | Dominant cost |
-
-<p align="center"><em>Table 5.1: Decomposed squared Euclidean distance computation strategy.</em></p>
-
-
-**The critical insight.** The dot product term $\langle q, c \rangle$ — when computed for all query-candidate pairs simultaneously — becomes a **matrix multiplication**: $Q \cdot C^T$, where $Q \in \mathbb{R}^{|Q| \times D}$ and $C \in \mathbb{R}^{|B| \times D}$. This is precisely the operation for which GPU Tensor Cores are designed, achieving near-peak throughput.
-
-### 5.4.3 Numerical Stability: The `torch.clamp` Guard
-
-A critical engineering detail: in 384-dimensional space, the algebraic decomposition $\|q\|^2 + \|c\|^2 - 2\langle q, c \rangle$ can produce **negative values** due to floating-point arithmetic errors, particularly when $q$ and $c$ are very similar (the subtraction of two nearly-equal large numbers). Taking the square root of a negative distance produces catastrophic $NaN$ errors that silently corrupt all downstream computations.
-
-We apply a numerical clamp:
-
-```python
-dist_sq = query_norms + candidate_norms - 2 * dot_products
-dist_sq = torch.clamp(dist_sq, min=0.0)  # Prevent NaN from sqrt of negative
-distances = torch.sqrt(dist_sq)
+OUTPUT FORMAT: JSON with fields [category, parameter, old_value,
+new_value, rationale, expected_impact]
 ```
 
-This single line — `torch.clamp(dist_sq, min=0.0)` — prevents floating-point underflow from propagating through the pipeline. Without it, approximately 0.01–0.1% of distance computations in high-dimensional space produce negative values, leading to $NaN$ anomaly scores that cause the entire batch to fail silently.
-
-### 5.4.4 Batched Matrix Multiplication on GPU
-
-In PyTorch, the complete distance computation translates to:
-
-```python
-# Precomputed during fit:
-self.coreset_norms = (self.memory_bank ** 2).sum(dim=1)  # Shape: (|M_C|,)
-
-# At inference (per-bucket or batched):
-query_norms = (queries ** 2).sum(dim=1, keepdim=True)    # Shape: (|Q|, 1)
-dot_products = torch.mm(queries, candidates.T)            # Shape: (|Q|, |B|)
-distances = query_norms + candidate_norms - 2 * dot_products  # Broadcasting
-distances = torch.clamp(distances, min=0.0)
-```
-
-**Why `torch.mm` is fast.** On NVIDIA GPUs, `torch.mm` dispatches to cuBLAS, which applies tiling, shared memory caching, and warp-level parallelism to achieve >90% of the GPU's theoretical peak FP32 throughput.
-
-### 5.4.5 Combined Speedup Analysis
-
-The total inference pipeline acceleration from both optimizations is summarized in Table 5.2:
-
-| Component | Exact Search | LSH + XOR | Speedup |
-|:---|:---|:---|:---|
-| Candidate selection | All 10,240 | ~33 per query | 310× |
-| Distance computation | Element-wise loop | Matrix multiplication | 3–5× |
-| **Combined** | **Baseline** | **Both optimizations** | **~1,000–1,500×** (derived from Table 5.1; end-to-end latency in §8.6) |
-
-<p align="center"><em>Table 5.2: Combined speedup analysis of LSH + XOR-Probe vs exact search.</em></p>
-
-
-**Caveat.** The combined speedup is not the product of individual speedups because the optimizations operate on different bottlenecks (candidate count vs. per-distance computation). The LSH overhead (12 dot products for hashing + bucket lookup) adds a constant cost of approximately 0.01ms per query, which is negligible relative to the search savings.
+**Why structured output is essential.** Without format constraints, the LLM may produce verbose, ambiguous, or inconsistent recommendations. The JSON output format ensures that proposals are machine-parseable and can be automatically applied by the Executor without human intervention.
 
 ---
 
-## 5.5 Cross-Module Interaction Analysis
+## 7.3 Convergence and Termination Criteria
 
-The coreset selection (Chapter 4.4) and LSH indexing are not independent design choices — they interact in a non-trivial way. On the positive side, the greedy coreset algorithm maximizes the minimum inter-point distance in the selected subset, producing a coreset with more uniform spatial distribution in the 384-d feature space, which in turn produces more uniform hash bucket populations that maximize LSH search efficiency. On the negative side, aggressive coreset reduction (ratio < 5%) can create sparse regions in the feature space where a bucket may contain zero or one coreset vectors; if a query patch hashes to such a sparse bucket, the XOR-Probe may not find a sufficiently close nearest neighbor, producing an inflated distance score.
+The agentic loop requires explicit termination criteria to prevent infinite iteration: (1) a performance ceiling where all categories achieve AUROC ≥ 0.95; (2) marginal returns where AUROC improvement from the last iteration is < 0.5% for all categories; (3) budget exhaustion via a maximum iteration count (e.g., 10 cycles); and (4) constraint violation where a proposed configuration would exceed the 6GB VRAM budget or the 1-second latency constraint.
 
-The approximate search also introduces a subtle asymmetry in anomaly scoring. For normal patches, the true nearest neighbor is typically very close (small $\theta$), so the XOR-Probe recall is high (>95%) and the reported distance closely approximates the exact distance. For anomalous patches, however, the true nearest neighbor is far (large $\theta$) because no coreset member resembles the defective region. In this case, it does not matter which coreset member is identified as "nearest" — all candidates produce large distances and the LSH approximation error is dwarfed by the anomaly signal. This favorable asymmetry, where the approximation error is concentrated precisely where it matters least and minimized where it matters most, is a structural property of the nearest-neighbor anomaly detection framework.
-
----
-
-## 5.6 Failure Modes of the Optimization Layer
-
-Two failure modes merit consideration. The first is *hash collision clustering*: if the random hyperplanes happen to align with the principal axes of the data distribution (a low-probability but non-zero event), the hash function may produce pathologically non-uniform bucket distributions, with more than 50% of the coreset hashing to a small number of buckets and negating the search efficiency gains. This can be mitigated by using multiple independent hash tables (multi-probe LSH) at the cost of increased memory and lookup overhead. The second failure mode is *dimensional mismatch*: the LSH hash quality degrades as the intrinsic dimensionality of the data deviates from the ambient dimensionality (384). If the coreset embeddings effectively occupy a much lower-dimensional subspace (e.g., 20–30 dimensions due to the pre-trained backbone's feature correlation structure), the 12 random hyperplanes may be excessively redundant. A principled solution would be to apply PCA before hashing and select $k$ based on the effective dimensionality, but this adds preprocessing complexity.
+Unlike gradient-based optimization, the agentic loop has no formal convergence guarantee. The LLM may propose configurations that degrade performance or oscillate between configurations. Practical mitigations include a rollback mechanism (reverting and recording failed proposals to prevent re-suggestion), history injection (including previous proposals and their outcomes in the prompt), and exploration bounds (defining min/max ranges for each hyperparameter to prevent extreme values).
 
 ---
 
-# CHAPTER 6: SYSTEM ARCHITECTURE & DEPLOYMENT PIPELINE — From Raw Images to Actionable Decisions
+## 7.4 Explainable AI: From Scores to Diagnoses
+
+The anomaly detection pipeline produces three outputs per image: a scalar Anomaly Index (e.g., $I = 1.47$), a spatial Anomaly Heatmap (32×32, upsampled to input resolution), and a binary Decision (Normal/Anomalous). For a machine learning researcher, these outputs are sufficient. For a quality engineer on the production floor, however, they are opaque — the engineer needs to know what type of defect was detected, where exactly it is located, how severe it is, and what corrective action should be taken.
+
+We address this interpretation gap through a **Semantic Bridge** that converts numerical anomaly outputs into natural-language diagnostic reports using Gemini's vision-language capabilities. The process proceeds in three stages. First, the system constructs a structured context object containing the product category, Anomaly Index value, anomaly heatmap, and historical defect patterns. Second, this assembled context is sent to Gemini with a diagnostic prompt requesting defect type classification, severity assessment, probable root cause, and recommended corrective action. Third, the LLM generates a structured diagnostic report such as: *"Defect Classification: Linear crack at bottle neck region. Severity: Critical — structural integrity compromised at a stress concentration zone. Probable Cause: Thermal stress during molding process, possibly due to cooling rate differential between neck and body sections. Recommended Action: Reject this unit. Inspect mold station #4 for thermal uniformity."*
+
+Three limitations of LLM-based diagnosis merit discussion. First, the *hallucination risk*: the LLM may generate plausible-sounding but factually incorrect diagnoses, as it does not have access to the actual production process parameters. All LLM-generated diagnoses should be treated as suggestions requiring expert validation. Second, the *latency overhead*: each LLM API call introduces 1–3 seconds of additional latency, which is acceptable for offline batch analysis but may be prohibitive for real-time inline inspection. Third, the *determinism* concern: LLM outputs are stochastic, meaning the same input may produce different diagnostic text across calls. For regulatory environments that require reproducible inspection records, the LLM diagnosis must be logged alongside the deterministic numerical outputs (Anomaly Index, heatmap coordinates) that serve as the official inspection record.
+
+---
+
+## 7.5 Positioning Within the Research Landscape
+
+The agentic optimization loop can be viewed as a form of **LLM-assisted AutoML** [20]. Unlike traditional AutoML, which uses surrogate models (Gaussian Processes, Tree-structured Parzen Estimators) to approximate the objective function, our approach uses a pre-trained language model as the surrogate. The advantage is that the LLM surrogate comes with built-in domain knowledge about machine learning — it "knows" that increasing model capacity generally improves accuracy at the cost of speed. This knowledge is not learned from the optimization history but transferred from the LLM's pre-training corpus.
+
+The XAI layer positions the system within the **Human-in-the-Loop ML** paradigm, where automated systems and human experts collaborate. The key design principle is *appropriate trust calibration*: the system should make operators aware of both its findings and its confidence level. The three-zone risk categorization (Safe/Warning/Critical) provides this calibration — the Warning zone explicitly communicates uncertainty, inviting human judgment rather than imposing an automated decision.
+
+---
+
+## 7.6 Cross-Module Interaction: Agentic Layer × Pipeline
+
+The agentic optimization layer interacts with every preceding component, as analyzed in Table 7.2:
+
+| Interaction | Mechanism | Impact |
+|:---|:---|:---|
+| Agent → Coreset (Ch. 4) | Adjusts `coreset_ratio` | Changes memory bank size, affecting search cost and coverage |
+| Agent → LSH (Ch. 5) | Could adjust `lsh_bits` | Changes bucket count, affecting search recall |
+| Agent → Calibration (Ch. 6) | Triggers re-computation of $\tau^*$ | Updated threshold for new coreset configuration |
+| Agent → Pipeline (Ch. 6.6) | Must verify VRAM budget | New config must fit within 6GB constraint |
+
+<p align="center"><em>Table 7.2: Cross-module interaction analysis for the Agentic optimization loop.</em></p>
 
 
+**The constraint propagation problem.** When the agent proposes increasing `coreset_ratio` from 0.1 to 0.2, this doubles the memory bank size, which:
+1. Doubles the LSH search candidate count per bucket
+2. Increases VRAM usage by ~12 MB
+3. Requires recalibrating the threshold (the score distribution shifts with coreset size)
 
+The agent must reason about these cascading effects — a proposal that optimizes one metric (AUROC) while violating a system constraint (VRAM) is invalid. This is where the structured prompt (Section 7.2.3) plays a critical role: by explicitly stating the hardware constraints, the prompt prevents the agent from proposing infeasible configurations.
+
+---
+
+## 7. Ethical Considerations
+*(As discussed in License Compliance & Academic Integrity)*
+
+<div style="page-break-after: always;"></div>
+
+# V. System Design and Implementation
+
+## 1. AI Model Integration
 <div align="center">
   <img src="assets/architecture/diagram_system.png" alt="End-to-End System Pipeline and Calibration" style="max-width: 90%; width: auto;"/>
   <br>
@@ -1056,163 +858,53 @@ To ensure absolute reproducibility across different hardware environments, the e
 
 ---
 
-# CHAPTER 7: AGENTIC ML & EXPLAINABLE AI — Closing the Optimization Loop
+## 2. Data Flow and Processing
+*(See System Architecture & Deployment Pipeline)*
 
+## 3. Deployment Strategy
+This chapter presents the actual deployment artifact resulting from the theoretical developments in the previous chapters. The system has been encapsulated into a production-ready, interactive web application using Flask, seamlessly bridging the Python-based PyTorch inference engine with a dynamic HTML/CSS frontend.
 
+## 9.1 Web Application Interface
 
-The system described in Chapters 3–6 is a **static pipeline**: once the coreset is selected, the LSH index is built, and the threshold is calibrated, the system's behavior is frozen. It cannot adapt to distributional shifts in production data, refine its own hyperparameters based on observed performance, or communicate the rationale behind its decisions to human operators. This chapter addresses these limitations through two complementary extensions: an **autonomous hyperparameter optimization agent** powered by a Large Language Model (LLM), and an **Explainable AI (XAI) layer** that transforms numerical anomaly outputs into natural-language diagnostic reports.
+The local web interface (Figure 9.1) allows quality assurance operators to upload single or batch product images, automatically classifying the item using YOLOv8, running multi-modal inference, and generating Explainable AI (XAI) reports in sub-second speeds.
+
+<div align="center">
+  <img src="assets/demo/main_interface.png" alt="IAD Web Interface Screenshot" style="max-width: 90%; width: auto; border: 1px solid #ccc;"/>
+  <br>
+  <p><em>Figure 9.1: Main dashboard of the Industrial Anomaly Detection web application.</em></p>
+</div>
+
+## 9.2 Explainable AI & Grad-CAM in Action
+
+The true utility of the proposed system comes from its ability to visually locate defects dynamically, as demonstrated in Figure 9.2, alongside a generative chatbot assistant that explains the scores.
+
+<div align="center">
+  <img src="assets/demo/heatmap_detection.png" alt="Heatmap Anomaly Detection" style="max-width: 60%; width: auto; border: 1px solid #ccc;"/>
+  <br>
+  <p><em>Figure 9.2: The system detecting a micro-defect. The PatchCore/Grad-CAM heatmap is overlaid on the original image, guiding the human operator's attention to the exact root cause.</em></p>
+</div>
+
+## 9.3 Expert System Chatbot
+
+The Expert System Chatbot (Figure 9.3) serves as the final interpretive layer, translating numerical anomaly scores and heatmap outputs into natural-language diagnostic reports for non-technical operators.
+
+<div align="center">
+  <img src="assets/demo/chatbot_assistant.png" alt="XAI Chatbot Assistant" style="max-width: 50%; width: auto; border: 1px solid #ccc;"/>
+  <br>
+  <p><em>Figure 9.3: The IAD Assistant Chatbot interpreting the results and advising the user.</em></p>
+</div>
+
 
 ---
 
-## 7.1 The Hyperparameter Sensitivity Problem
+## 4. Scalability and Maintenance
+*(Scalability optimizations covered in LSH-accelerated approximate search and VRAM cost analysis)*
 
-### 7.1.1 Category-Specific Optimal Configurations
+<div style="page-break-after: always;"></div>
 
-The PatchCore pipeline exposes several hyperparameters whose optimal values vary significantly across product categories, as shown in Table 7.1:
+# VI. Results and Discussion
 
-| Hyperparameter | Effect | Optimal Range Varies Because |
-|:---|:---|:---|
-| `coreset_ratio` | Memory bank compression | Texture complexity differs per category |
-| `k_neighbors` | Score smoothing | Noise level differs per category |
-| `lsh_bits` | Search granularity | Embedding distribution shape differs |
-
-<p align="center"><em>Table 7.1: Category-specific hyperparameter sensitivity analysis.</em></p>
-
-
-For 15 MVTec AD categories, exhaustive grid search over even a modest 3-parameter space with 5 values each would require $5^3 = 125$ training runs per category, totaling $15 \times 125 = 1{,}875$ experiments. At approximately 2 minutes per training run, this represents over 60 hours of computation — impractical for iterative development.
-
-### 7.1.2 The Limitations of Conventional AutoML
-
-Standard hyperparameter optimization methods address this problem through different strategies:
-
-- **Grid Search**: Exhaustive but combinatorially explosive.
-- **Random Search** [10] (Bergstra & Bengio, 2012): More efficient than grid search for high-dimensional spaces, but provides no mechanism for reasoning about *why* certain configurations perform better.
-- **Bayesian Optimization** [29] (e.g., Gaussian Process-based): Efficient sample-wise, but treats the objective function as a black box. It cannot leverage domain knowledge to warm-start the search.
-- **Population-based Training**: Requires parallel infrastructure and is designed for neural network training, not for the discrete hyperparameter space of a memory-bank-based system.
-
-None of these methods can **reason about the relationship** between performance metrics and hyperparameter choices in a way that transfers across categories.
-
----
-
-## 7.2 The Agentic Optimization Architecture
-
-### 7.2.1 LLM as a Research Agent
-
-We introduce a fundamentally different approach: using a Large Language Model (Gemini) as an **autonomous research agent** that reads experimental results, reasons about performance patterns, and proposes hyperparameter adjustments.
-
-The agent operates in a closed feedback loop:
-
-```
-┌─────────────────────────────────────────────────────┐
-│                    AGENTIC LOOP                     │
-│                                                     │
-│  1. RUNNER                                          │
-│     Execute evaluation across 15 categories         │
-│     Output: results/*.json (AUROC, F1, latency)     │
-│                        ↓                            │
-│  2. READER (Gemini Agent)                           │
-│     Parse JSON results into structured context      │
-│     Identify underperforming categories              │
-│                        ↓                            │
-│  3. REASONER (Gemini Agent)                         │
-│     Analyze: "Screw AUROC=0.75, latency=20ms"       │
-│     Hypothesis: "Low AUROC + fast latency →          │
-│       coreset too aggressive, increase ratio"        │
-│                        ↓                            │
-│  4. PROPOSER (Gemini Agent)                         │
-│     Output: New configuration JSON                   │
-│     {coreset_ratio: 0.2, k_neighbors: 3}            │
-│                        ↓                            │
-│  5. EXECUTOR                                        │
-│     Apply new config → Retrain → Re-evaluate        │
-│     Output: Updated results/*.json                   │
-│                        └──────→ Back to Step 2      │
-└─────────────────────────────────────────────────────┘
-```
-
-The critical distinction between this approach and conventional AutoML is the **reasoning step** (Step 3). The LLM does not treat the hyperparameter-performance relationship as a black box. Instead, it leverages its pre-trained knowledge of machine learning to form mechanistic hypotheses. For example, when analyzing a category like "Screw" that achieves AUROC 0.75 with `coreset_ratio=0.1`, `k_neighbors=1`, and `inference_time=18ms`, the agent reasons: *"The low AUROC indicates insufficient coverage of the nominal feature distribution. The fast inference time suggests computational headroom is available. The 'Screw' category is known to have high intra-class variability. Therefore, increasing coreset_ratio to 0.2 and k_neighbors to 3 should improve AUROC by 5–10% with approximately 2× inference time increase, which remains within acceptable limits."* This reasoning chain is transferable: once the agent learns that high-texture-variability categories benefit from higher coreset ratios, it can apply this insight proactively to new categories without requiring experimentation.
-
-The quality of the agent's reasoning depends critically on the **prompt structure**. We employ a structured prompt template that specifies the system role, context (model type, current results, hardware constraints), task (identify underperforming categories and propose changes), and output format (JSON). The structured JSON output format ensures that proposals are machine-parseable and can be automatically applied by the Executor without human intervention:
-
-```
-SYSTEM: You are an expert ML researcher optimizing an anomaly 
-detection system. You analyze experimental results and propose 
-hyperparameter adjustments.
-
-CONTEXT:
-- Model: PatchCore with LSH acceleration
-- Current results: [JSON data from results/]
-- Hardware: 6GB VRAM, sequential processing
-- Constraint: Inference time must remain < 1 second per image
-
-TASK: Identify categories with AUROC < 0.90 and propose specific
-hyperparameter changes. For each proposal, explain:
-1. What to change and by how much
-2. Why this change should improve performance  
-3. What side effects to expect (speed, memory)
-4. What to monitor in the next iteration
-
-OUTPUT FORMAT: JSON with fields [category, parameter, old_value,
-new_value, rationale, expected_impact]
-```
-
-**Why structured output is essential.** Without format constraints, the LLM may produce verbose, ambiguous, or inconsistent recommendations. The JSON output format ensures that proposals are machine-parseable and can be automatically applied by the Executor without human intervention.
-
----
-
-## 7.3 Convergence and Termination Criteria
-
-The agentic loop requires explicit termination criteria to prevent infinite iteration: (1) a performance ceiling where all categories achieve AUROC ≥ 0.95; (2) marginal returns where AUROC improvement from the last iteration is < 0.5% for all categories; (3) budget exhaustion via a maximum iteration count (e.g., 10 cycles); and (4) constraint violation where a proposed configuration would exceed the 6GB VRAM budget or the 1-second latency constraint.
-
-Unlike gradient-based optimization, the agentic loop has no formal convergence guarantee. The LLM may propose configurations that degrade performance or oscillate between configurations. Practical mitigations include a rollback mechanism (reverting and recording failed proposals to prevent re-suggestion), history injection (including previous proposals and their outcomes in the prompt), and exploration bounds (defining min/max ranges for each hyperparameter to prevent extreme values).
-
----
-
-## 7.4 Explainable AI: From Scores to Diagnoses
-
-The anomaly detection pipeline produces three outputs per image: a scalar Anomaly Index (e.g., $I = 1.47$), a spatial Anomaly Heatmap (32×32, upsampled to input resolution), and a binary Decision (Normal/Anomalous). For a machine learning researcher, these outputs are sufficient. For a quality engineer on the production floor, however, they are opaque — the engineer needs to know what type of defect was detected, where exactly it is located, how severe it is, and what corrective action should be taken.
-
-We address this interpretation gap through a **Semantic Bridge** that converts numerical anomaly outputs into natural-language diagnostic reports using Gemini's vision-language capabilities. The process proceeds in three stages. First, the system constructs a structured context object containing the product category, Anomaly Index value, anomaly heatmap, and historical defect patterns. Second, this assembled context is sent to Gemini with a diagnostic prompt requesting defect type classification, severity assessment, probable root cause, and recommended corrective action. Third, the LLM generates a structured diagnostic report such as: *"Defect Classification: Linear crack at bottle neck region. Severity: Critical — structural integrity compromised at a stress concentration zone. Probable Cause: Thermal stress during molding process, possibly due to cooling rate differential between neck and body sections. Recommended Action: Reject this unit. Inspect mold station #4 for thermal uniformity."*
-
-Three limitations of LLM-based diagnosis merit discussion. First, the *hallucination risk*: the LLM may generate plausible-sounding but factually incorrect diagnoses, as it does not have access to the actual production process parameters. All LLM-generated diagnoses should be treated as suggestions requiring expert validation. Second, the *latency overhead*: each LLM API call introduces 1–3 seconds of additional latency, which is acceptable for offline batch analysis but may be prohibitive for real-time inline inspection. Third, the *determinism* concern: LLM outputs are stochastic, meaning the same input may produce different diagnostic text across calls. For regulatory environments that require reproducible inspection records, the LLM diagnosis must be logged alongside the deterministic numerical outputs (Anomaly Index, heatmap coordinates) that serve as the official inspection record.
-
----
-
-## 7.5 Positioning Within the Research Landscape
-
-The agentic optimization loop can be viewed as a form of **LLM-assisted AutoML** [20]. Unlike traditional AutoML, which uses surrogate models (Gaussian Processes, Tree-structured Parzen Estimators) to approximate the objective function, our approach uses a pre-trained language model as the surrogate. The advantage is that the LLM surrogate comes with built-in domain knowledge about machine learning — it "knows" that increasing model capacity generally improves accuracy at the cost of speed. This knowledge is not learned from the optimization history but transferred from the LLM's pre-training corpus.
-
-The XAI layer positions the system within the **Human-in-the-Loop ML** paradigm, where automated systems and human experts collaborate. The key design principle is *appropriate trust calibration*: the system should make operators aware of both its findings and its confidence level. The three-zone risk categorization (Safe/Warning/Critical) provides this calibration — the Warning zone explicitly communicates uncertainty, inviting human judgment rather than imposing an automated decision.
-
----
-
-## 7.6 Cross-Module Interaction: Agentic Layer × Pipeline
-
-The agentic optimization layer interacts with every preceding component, as analyzed in Table 7.2:
-
-| Interaction | Mechanism | Impact |
-|:---|:---|:---|
-| Agent → Coreset (Ch. 4) | Adjusts `coreset_ratio` | Changes memory bank size, affecting search cost and coverage |
-| Agent → LSH (Ch. 5) | Could adjust `lsh_bits` | Changes bucket count, affecting search recall |
-| Agent → Calibration (Ch. 6) | Triggers re-computation of $\tau^*$ | Updated threshold for new coreset configuration |
-| Agent → Pipeline (Ch. 6.6) | Must verify VRAM budget | New config must fit within 6GB constraint |
-
-<p align="center"><em>Table 7.2: Cross-module interaction analysis for the Agentic optimization loop.</em></p>
-
-
-**The constraint propagation problem.** When the agent proposes increasing `coreset_ratio` from 0.1 to 0.2, this doubles the memory bank size, which:
-1. Doubles the LSH search candidate count per bucket
-2. Increases VRAM usage by ~12 MB
-3. Requires recalibrating the threshold (the score distribution shifts with coreset size)
-
-The agent must reason about these cascading effects — a proposal that optimizes one metric (AUROC) while violating a system constraint (VRAM) is invalid. This is where the structured prompt (Section 7.2.3) plays a critical role: by explicitly stating the hardware constraints, the prompt prevents the agent from proposing infeasible configurations.
-
----
-
-# CHAPTER 8: EXPERIMENTS & EVALUATION — Empirical Validation on MVTec AD
-
-
-
+## 1. Results and Analysis
 This chapter presents the empirical evaluation of the proposed system across all 15 categories of the MVTec Anomaly Detection dataset. We structure the evaluation around four objectives: (1) establishing baseline performance for each model in the comparative triad; (2) demonstrating the incremental contribution of each optimization component through ablation studies; (3) positioning the system against published state-of-the-art results; and (4) analyzing failure cases to identify systematic limitations.
 
 ---
@@ -1351,8 +1043,7 @@ PatchCore achieves the highest image-level AUROC on 7 categories — Hazelnut (0
 
 ---
 
-## 8.4 SOTA Benchmarking
-
+## 2. Discussion
 Comparative analysis against published state-of-the-art architectures is shown in Table 8.7:
 
 | Method | Year | Backbone | Mean Image AUROC | Inference | VRAM |
@@ -1479,8 +1170,7 @@ Three key findings emerge from this analysis. First, *category-specific adaptati
 
 ---
 
-## 8.6 Latency Profiling
-
+## 3. Recommendations
 Detailed latency breakdown for a single image (Enhanced PatchCore V5):
 
 | Pipeline Stage | Time (ms) | % of Total |
@@ -1516,82 +1206,9 @@ Defects with Anomaly Index values close to 1.0 (near the Youden threshold) repre
 
 ---
 
-# CHAPTER 9: SYSTEM DEMONSTRATION & DEPLOYMENT
+<div style="page-break-after: always;"></div>
 
-This chapter presents the actual deployment artifact resulting from the theoretical developments in the previous chapters. The system has been encapsulated into a production-ready, interactive web application using Flask, seamlessly bridging the Python-based PyTorch inference engine with a dynamic HTML/CSS frontend.
-
-## 9.1 Web Application Interface
-
-The local web interface (Figure 9.1) allows quality assurance operators to upload single or batch product images, automatically classifying the item using YOLOv8, running multi-modal inference, and generating Explainable AI (XAI) reports in sub-second speeds.
-
-<div align="center">
-  <img src="assets/demo/main_interface.png" alt="IAD Web Interface Screenshot" style="max-width: 90%; width: auto; border: 1px solid #ccc;"/>
-  <br>
-  <p><em>Figure 9.1: Main dashboard of the Industrial Anomaly Detection web application.</em></p>
-</div>
-
-## 9.2 Explainable AI & Grad-CAM in Action
-
-The true utility of the proposed system comes from its ability to visually locate defects dynamically, as demonstrated in Figure 9.2, alongside a generative chatbot assistant that explains the scores.
-
-<div align="center">
-  <img src="assets/demo/heatmap_detection.png" alt="Heatmap Anomaly Detection" style="max-width: 60%; width: auto; border: 1px solid #ccc;"/>
-  <br>
-  <p><em>Figure 9.2: The system detecting a micro-defect. The PatchCore/Grad-CAM heatmap is overlaid on the original image, guiding the human operator's attention to the exact root cause.</em></p>
-</div>
-
-## 9.3 Expert System Chatbot
-
-The Expert System Chatbot (Figure 9.3) serves as the final interpretive layer, translating numerical anomaly scores and heatmap outputs into natural-language diagnostic reports for non-technical operators.
-
-<div align="center">
-  <img src="assets/demo/chatbot_assistant.png" alt="XAI Chatbot Assistant" style="max-width: 50%; width: auto; border: 1px solid #ccc;"/>
-  <br>
-  <p><em>Figure 9.3: The IAD Assistant Chatbot interpreting the results and advising the user.</em></p>
-</div>
-
-
----
-
-# CHAPTER 10: PROJECT MANAGEMENT PLAN
-
-To systematically achieve the rigorous objectives outlined above, a formalized project management governance structure was established. This chapter elucidates the distribution of analytical and engineering workloads across the research team, ensuring chronological consistency and theoretical integrity throughout the thesis duration.
-
-## 10.1 Research Team Structure and Responsibilities
-
-The execution paradigm was decentralized, mapping specific algorithmic capabilities directly to individual core competencies within the triad of the research group.
-
-| Role | Member Name | Core Academic & Engineering Responsibilities |
-|:---|:---|:---|
-| **Project Lead & AI Architect** | NGUYEN HOANG MINH SON | Principal architect of the LSH-accelerated PatchCore engine. Designed the Agentic hyperparameter optimization loop and the mathematical underpinnings of the Anomaly Index $\tau^*$. Led theoretical validation. |
-| **Data Engineer & ML Researcher** | NGUYEN DANG THAI BINH & ON NGUYEN THIEN PHUC | Directed the Knowledge Distillation pipeline for the CustomResNet-18 backbone. Architected the CNN+OC-SVM integration logic and formalized the MVTec AD batch processing workflow. |
-| **Software Engineer & XAI Integrator** | LE THANH THAO NHI | Consolidated the standalone algorithms into a continuous Flask production codebase. Engineered the Grad-CAM visualization bridging and the Gemini Explainable AI conversational interface. |
-
-<p align="center"><em>Table 10.1: Research team structure and responsibilities.</em></p>
-
-
-## 10.2 Project Schedule and Milestone Orchestration
-
-The research trajectory was rigorously constrained into a multi-phase operational layout, ensuring that theoretical derivations gracefully translated into empirical deployment capability.
-
-| Phase | Duration | Objective & Key Output Deliverables | Status |
-|:---|:---|:---|:---:|
-| **1. Theoretical Initiation** | Weeks 1-2 | Extensive literature review surrounding UAD paradigms, Coreset theorems, and dimensionality reduction geometries. | Completed |
-| **2. Architectural Design** | Weeks 3-4 | Drafting the mathematical framework for the computationally bounded feature triad. Formulating YOLOv8 gating mechanisms. | Completed |
-| **3. Core Algorithm Implementation** | Weeks 5-7 | Developing the PatchCore core logic, executing LSH hashing integration, and training the ResNet-18 extraction network. | Completed |
-| **4. Integration & UI/UX** | Weeks 8-9 | Fusing mathematical outputs into the local Flask server architecture and weaving the HTML/JS semantic bridge. | Completed |
-| **5. Empirical Validation** | Weeks 10-11 | Orchestrating automated LLM hyperparameter generation over the 15 MVTec domains. Calibrating ROC optimal thresholds. | Completed |
-| **6. Documentation & Defense** | Weeks 12-14 | Compilation of empirical data, synthesis of the final academic thesis report, and system demonstrations setup. | Completed |
-
-<p align="center"><em>Table 10.2: Project schedule and milestone orchestration.</em></p>
-
-
-
----
-
-# CHAPTER 11: CONCLUSION & FUTURE WORK
-
-
+# VII. Conclusion
 
 ## 11.1 Summary of Contributions
 
@@ -1623,6 +1240,8 @@ Third, *Online Memory Bank Updates* would address the static memory bank limitat
 Fourth, *Edge Deployment via ONNX/TensorRT* would enable deployment directly on inspection cameras or edge computing modules (NVIDIA Jetson, Intel NCS) through ONNX export and TensorRT optimization, including operator fusion (Conv + BN + ReLU → single kernel), layer and tensor memory optimization, and fixed-point INT8 calibration using the nominal training set as the calibration dataset, targeting sub-100ms inference on Jetson Orin Nano (8GB unified memory).
 
 ---
+
+<div style="page-break-after: always;"></div>
 
 # REFERENCES
 
@@ -1687,6 +1306,8 @@ Fourth, *Edge Deployment via ONNX/TensorRT* would enable deployment directly on 
 [30] E. Bernhardsson, "Annoy: Approximate Nearest Neighbors in C++/Python," Available: https://github.com/spotify/annoy, 2015.
 
 ---
+
+<div style="page-break-after: always;"></div>
 
 # APPENDICES
 
@@ -1800,4 +1421,3 @@ An extended glossary of technical terms is summarized in Table A.2:
 
 
 ---
-
